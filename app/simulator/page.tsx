@@ -10,9 +10,9 @@ export const metadata = {
 
 export default function SimulatorPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <header className="mb-6">
-        <h1 className="text-2xl font-medium text-cream sm:text-3xl">
+        <h1 className="text-2xl font-medium text-deep sm:text-3xl">
           Supplemental Application Practice
         </h1>
         <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">

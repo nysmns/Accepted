@@ -32,8 +32,7 @@ export default function Vault() {
     <div>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="eyebrow">Program Vault</p>
-          <h1 className="mt-2 font-display text-2xl font-semibold text-cream md:text-3xl">
+          <h1 className="mt-2 font-display text-2xl font-semibold text-deep md:text-3xl">
             Ontario Supplemental Program Guide
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted">
@@ -51,7 +50,7 @@ export default function Vault() {
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search programs and requirements"
               placeholder="Search program name..."
-              className="w-full rounded-lg border border-line bg-ink py-2.5 pl-9 pr-3 text-sm text-cream outline-none focus:border-accent"
+              className="w-full rounded-lg bg-sand py-2.5 pl-9 pr-3 text-sm text-deep outline-none focus:ring-2 focus:ring-moss"
             />
           </div>
         </div>
@@ -60,7 +59,7 @@ export default function Vault() {
       <p className="mt-4 text-xs text-muted">
         {average == null ? (
           <>
-            <Link href="/planner" className="font-semibold text-accent hover:underline">
+            <Link href="/planner" className="font-semibold text-moss hover:underline">
               Set your average in the Planner
             </Link>{' '}
             to see where you sit on each range.
@@ -78,8 +77,8 @@ export default function Vault() {
             aria-pressed={uniKey === u.key}
             className={`rounded-xl px-3 py-3 text-xs font-medium transition ${
               uniKey === u.key
-                ? 'bg-accent text-ink shadow'
-                : 'border border-line bg-panel text-muted hover:text-cream'
+                ? 'bg-navy text-paper shadow'
+                : ' bg-surface text-muted hover:text-deep'
             }`}
           >
             {u.short}
@@ -88,21 +87,21 @@ export default function Vault() {
       </div>
 
       <div className="panel mt-4 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-ink/50 p-4 sm:p-5">
-          <h2 className="text-lg font-bold text-cream">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-paper/95 p-4 sm:p-5">
+          <h2 className="text-lg font-bold text-deep">
             {university.name} — Programs with Supplemental Requirements
           </h2>
-          <span className="rounded-full border border-accent/40 bg-accent-deep/20 px-3 py-1 text-xs font-medium text-accent-soft">
+          <span className="rounded-full bg-sage/40 px-3 py-1 text-sm font-medium text-deep">
             {rows.length} Program{rows.length === 1 ? '' : 's'} Listed
           </span>
         </div>
 
         <div className="space-y-3 p-3 md:hidden">
           {rows.map((program) => (
-            <article key={program.name} className="rounded-xl border border-line bg-ink/50 p-4">
+            <article key={program.name} className="rounded-xl bg-paper/95 p-4">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-base font-semibold text-cream">{program.name}</h3>
-                <span className="shrink-0 rounded-md bg-accent-deep px-2 py-1 text-xs font-semibold text-accent">
+                <h3 className="text-base font-semibold text-deep">{program.name}</h3>
+                <span className="shrink-0 rounded-md bg-sage/40 px-2 py-1 text-sm font-semibold text-deep">
                   {program.avg}
                 </span>
               </div>
@@ -112,13 +111,13 @@ export default function Vault() {
                 <ProgramTags req={program.req} />
               </div>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xs font-medium text-gold">Deadline: {program.deadline}</span>
+                <span className="text-xs font-medium text-brick">Deadline: {program.deadline}</span>
                 <Link
                   href={`/simulator?program=${program.code}`}
                   onClick={() =>
                     trackEvent('practice_clicked', { code: program.code, program: program.name })
                   }
-                  className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-line bg-panel px-3 text-xs font-semibold text-accent transition hover:border-accent/50"
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-surface px-3 text-xs font-semibold text-moss transition hover:"
                 >
                   Practice prompt <ArrowRight className="h-3 w-3" />
                 </Link>
@@ -133,7 +132,7 @@ export default function Vault() {
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-line text-xs uppercase tracking-wider text-muted">
+              <tr className="text-xs text-muted">
                 <th className="whitespace-nowrap p-4 font-semibold">Program Name</th>
                 <th className="whitespace-nowrap p-4 font-semibold">Est. Competitive Average</th>
                 <th className="p-4 font-semibold">Supp App Requirements &amp; Format</th>
@@ -141,12 +140,12 @@ export default function Vault() {
                 <th className="whitespace-nowrap p-4 text-right font-semibold">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-navy/10">
               {rows.map((p) => (
-                <tr key={p.name} className="text-cream/90 transition hover:bg-panel-2/60">
-                  <td className="p-4 font-medium text-cream">{p.name}</td>
+                <tr key={p.name} className="text-deep/90 transition hover:bg-sand/60">
+                  <td className="p-4 font-medium text-deep">{p.name}</td>
                   <td className="p-4">
-                    <span className="rounded-md border border-accent/40 bg-accent-deep/20 px-2.5 py-1 font-semibold text-accent-soft">
+                    <span className="rounded-md bg-sage/40 px-2.5 py-1 font-semibold text-deep">
                       {p.avg}
                     </span>
                     <div className="mt-3">
@@ -157,14 +156,14 @@ export default function Vault() {
                     <p>{p.req}</p>
                     <ProgramTags req={p.req} />
                   </td>
-                  <td className="whitespace-nowrap p-4 font-mono text-xs text-gold">
+                  <td className="whitespace-nowrap p-4 tabular-nums text-xs text-brick">
                     {p.deadline}
                   </td>
                   <td className="p-4 text-right">
                     <Link
                       href={`/simulator?program=${p.code}`}
                       onClick={() => trackEvent('practice_clicked', { code: p.code, program: p.name })}
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-line bg-ink px-3 py-1.5 text-xs font-medium text-accent-soft transition hover:border-accent/50"
+                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-sand px-3 py-1.5 text-xs font-medium text-moss transition hover:"
                     >
                       Practice Prompt <ArrowRight className="h-3 w-3" />
                     </Link>

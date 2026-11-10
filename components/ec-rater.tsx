@@ -20,14 +20,14 @@ const MAX_ECS = 8;
 const blank = (): Ec => ({ id: crypto.randomUUID(), name: '', role: '', duration: '', hours: '', detail: '' });
 
 const TIER: Record<EcLevel, string> = {
-  standout: 'bg-accent text-ink',
-  strong: 'bg-accent-deep text-cream',
-  solid: 'border border-line text-cream',
-  light: 'border border-line text-muted',
+  standout: 'bg-moss text-paper',
+  strong: 'bg-sage text-deep',
+  solid: 'bg-sand text-deep',
+  light: 'bg-sand text-muted',
 };
 
 const field =
-  'w-full rounded-lg border border-line bg-ink p-2.5 text-sm text-cream outline-none focus:border-accent';
+  'w-full rounded-lg  bg-sand p-2.5 text-sm text-deep outline-none focus:ring-2 focus:ring-moss';
 
 export default function EcRater() {
   const [ecs, setEcs] = useState<Ec[]>([blank()]);
@@ -97,8 +97,7 @@ export default function EcRater() {
   return (
     <div className="space-y-8">
       <header className="max-w-3xl">
-        <p className="eyebrow">EC Rater</p>
-        <h1 className="mt-3 text-3xl font-medium leading-tight text-cream sm:text-4xl">
+        <h1 className="mt-3 text-3xl font-medium leading-tight text-deep sm:text-4xl">
           Rank your activities. Make them count.
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted sm:text-base">
@@ -129,16 +128,16 @@ export default function EcRater() {
           </div>
 
           {ecs.map((ec, i) => (
-            <fieldset key={ec.id} className="space-y-3 rounded-xl border border-line bg-ink/50 p-4">
+            <fieldset key={ec.id} className="space-y-3 rounded-xl bg-paper/95 p-4">
               <div className="flex items-center justify-between">
-                <legend className="text-xs font-semibold uppercase tracking-wider text-accent">
+                <legend className="text-xs font-semibold text-moss">
                   Activity {i + 1}
                 </legend>
                 {ecs.length > 1 && (
                   <button
                     onClick={() => setEcs((l) => l.filter((e) => e.id !== ec.id))}
                     aria-label={`Remove activity ${i + 1}`}
-                    className="rounded-lg p-1.5 text-muted transition hover:text-rose"
+                    className="rounded-lg p-1.5 text-muted transition hover:text-brick"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -163,14 +162,14 @@ export default function EcRater() {
           {ecs.length < MAX_ECS && (
             <button
               onClick={() => setEcs((l) => [...l, blank()])}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-moss hover:underline"
             >
               <Plus className="h-4 w-4" /> Add activity
             </button>
           )}
 
           {error && (
-            <div role="alert" className="flex items-center gap-2 border-l-2 border-rose bg-mortuum/40 px-4 py-3 text-sm text-rose">
+            <div role="alert" className="flex items-center gap-2 border-l-4 border-brick bg-brick px-4 py-3 text-sm text-brick">
               <MessageSquareWarning className="h-4 w-4 shrink-0" /> {error}
             </div>
           )}
@@ -178,7 +177,7 @@ export default function EcRater() {
           <button
             onClick={rate}
             disabled={loading}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 text-sm font-semibold text-ink transition hover:bg-accent-soft disabled:opacity-60"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-navy px-5 text-sm font-semibold text-paper transition hover:bg-deep disabled:opacity-60"
           >
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Rating…</> : 'Rank my ECs'}
           </button>
@@ -195,14 +194,14 @@ export default function EcRater() {
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${TIER[result.overallLevel]}`}>
                   Overall: {result.overallLevel}
                 </span>
-                <p className="mt-3 text-[15px] leading-relaxed text-cream">{result.summary}</p>
+                <p className="mt-3 text-[15px] leading-relaxed text-deep">{result.summary}</p>
               </div>
 
               <ol className="space-y-4">
                 {result.ranked.map((r, i) => (
-                  <li key={`${r.name}-${i}`} className="rounded-xl border border-line bg-ink/50 p-4">
+                  <li key={`${r.name}-${i}`} className="rounded-xl bg-paper/95 p-4">
                     <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-base font-medium text-cream">
+                      <h3 className="text-base font-medium text-deep">
                         {i + 1}. {r.name}
                       </h3>
                       <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${TIER[r.tier]}`}>
@@ -210,8 +209,8 @@ export default function EcRater() {
                       </span>
                     </div>
                     <p className="mt-2 text-sm leading-6 text-muted">{r.why}</p>
-                    <p className="mt-2 text-sm leading-6 text-cream">
-                      <span className="font-semibold text-accent">Make it count: </span>
+                    <p className="mt-2 text-sm leading-6 text-deep">
+                      <span className="font-semibold text-moss">Make it count: </span>
                       {r.leverage}
                     </p>
                   </li>
@@ -220,7 +219,7 @@ export default function EcRater() {
 
               {result.gaps.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-cream">Gaps to close</h3>
+                  <h3 className="text-sm font-semibold text-deep">Gaps to close</h3>
                   <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-6 text-muted">
                     {result.gaps.map((g, i) => (
                       <li key={i}>{g}</li>

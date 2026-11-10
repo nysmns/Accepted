@@ -147,8 +147,7 @@ export default function Planner() {
   return (
     <div className="space-y-7">
       <header className="max-w-3xl">
-        <p className="eyebrow">OUAC &amp; application planning</p>
-        <h1 className="mt-3 text-3xl font-medium leading-tight text-cream sm:text-4xl">
+        <h1 className="mt-3 text-3xl font-medium leading-tight text-deep sm:text-4xl">
           Keep the moving parts in one place.
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
@@ -157,7 +156,7 @@ export default function Planner() {
         </p>
       </header>
 
-      <div role="tablist" aria-label="Planner sections" className="flex gap-1 border-b border-line">
+      <div role="tablist" aria-label="Planner sections" className="flex gap-1">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -169,8 +168,8 @@ export default function Planner() {
             }}
             className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition ${
               tab === t.id
-                ? 'border-accent text-cream'
-                : 'border-transparent text-muted hover:text-cream'
+                ? 'border-moss text-deep'
+                : 'border-transparent text-muted hover:text-deep'
             }`}
           >
             {t.label}
@@ -185,8 +184,7 @@ export default function Planner() {
           <section className="panel p-5 sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="eyebrow">My program shortlist</p>
-                <h2 className="mt-2 text-lg font-medium text-cream">Build your list</h2>
+                <h2 className="mt-2 text-lg font-medium text-deep">Build your list</h2>
               </div>
               <span className="chip">{selected.length} program{selected.length === 1 ? '' : 's'}</span>
             </div>
@@ -225,8 +223,8 @@ export default function Planner() {
 
             <div className="mt-6">
               {selected.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-line px-5 py-10 text-center">
-                  <p className="text-sm font-medium text-cream">Your shortlist is ready to start</p>
+                <div className="rounded-xl bg-sand px-5 py-10 text-center">
+                  <p className="text-sm font-medium text-deep">Your shortlist is ready to start</p>
                   <p className="mt-1 text-sm text-muted">
                     Add the programs you are considering. Your list stays private in this browser.
                   </p>
@@ -238,12 +236,12 @@ export default function Planner() {
                     return (
                       <article
                         key={program.id}
-                        className="rounded-lg border border-line bg-ink/50 p-5"
+                        className="rounded-lg bg-paper/95 p-5"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <p className="text-xs font-medium text-muted">{program.university}</p>
-                            <h3 className="mt-1 text-lg font-medium text-cream">{program.name}</h3>
+                            <h3 className="mt-1 text-lg font-medium text-deep">{program.name}</h3>
                           </div>
                           <button
                             onClick={() => {
@@ -254,7 +252,7 @@ export default function Planner() {
                               trackEvent('program_removed', { code: program.code });
                             }}
                             aria-label={`Remove ${program.name}`}
-                            className="shrink-0 rounded-lg p-2 text-muted transition hover:bg-panel hover:text-rose"
+                            className="shrink-0 rounded-lg p-2 text-muted transition hover:bg-surface hover:text-brick"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -263,11 +261,11 @@ export default function Planner() {
                         <div className="mt-4 grid gap-4 sm:grid-cols-3">
                           <div>
                             <p className="text-xs text-muted">Listed average</p>
-                            <p className="mt-1 text-sm font-semibold text-cream">{program.avg}</p>
+                            <p className="mt-1 text-sm font-semibold text-deep">{program.avg}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted">Deadline reference</p>
-                            <p className="mt-1 text-sm font-semibold text-cream">{program.deadline}</p>
+                            <p className="mt-1 text-sm font-semibold text-deep">{program.deadline}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted">Academic position</p>
@@ -291,7 +289,7 @@ export default function Planner() {
                         </div>
                         <Link
                           href={`/simulator?program=${program.code}`}
-                          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+                          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-moss hover:underline"
                         >
                           Practise this application <ArrowRight className="h-4 w-4" />
                         </Link>
@@ -302,13 +300,13 @@ export default function Planner() {
               )}
             </div>
 
-            <div className="mt-6 border-t border-line pt-5">
+            <div className="mt-6 pt-5">
               <label
                 htmlFor="current-average"
-                className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-cream"
+                className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-deep"
               >
                 Current admission average
-                <span className="font-mono text-xl text-accent">{average}%</span>
+                <span className="tabular-nums text-xl text-moss">{average}%</span>
               </label>
               <input
                 id="current-average"
@@ -318,7 +316,7 @@ export default function Planner() {
                 step="1"
                 value={average}
                 onChange={(event) => updateAverage(event.target.value)}
-                className="mt-3 w-full accent-[#d9a94e]"
+                className="mt-3 w-full accent-[#4c6a5a]"
               />
               <div className="flex justify-between text-xs text-muted">
                 <span>50%</span>
@@ -336,8 +334,7 @@ export default function Planner() {
             <section className="panel p-5 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="eyebrow">Application checklist</p>
-                  <h2 className="mt-2 text-xl font-medium text-cream">Your next steps</h2>
+                  <h2 className="mt-2 text-xl font-medium text-deep">Your next steps</h2>
                 </div>
                 <span className="chip">{remaining} left</span>
               </div>
@@ -355,15 +352,15 @@ export default function Planner() {
                         toggleTask(task);
                       }}
                       aria-pressed={done}
-                      className="flex w-full items-start gap-3 rounded-lg px-2 py-3 text-left transition hover:bg-ink"
+                      className="flex w-full items-start gap-3 rounded-lg px-2 py-3 text-left transition hover:bg-sand"
                     >
                       {done ? (
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" />
                       ) : (
                         <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
                       )}
                       <span
-                        className={`text-sm leading-5 ${done ? 'text-muted line-through' : 'text-cream'}`}
+                        className={`text-sm leading-5 ${done ? 'text-muted line-through' : 'text-deep'}`}
                       >
                         {task}
                       </span>
@@ -373,16 +370,15 @@ export default function Planner() {
               </div>
               <p
                 aria-live="polite"
-                className={`mt-3 text-xs ${storageError ? 'text-rose' : 'text-muted'}`}
+                className={`mt-3 text-xs ${storageError ? 'text-brick' : 'text-muted'}`}
               >
                 {storageError ?? (saved ? 'Your updates are saved on this device.' : 'Changes save automatically.')}
               </p>
             </section>
 
-            <section className="panel border-accent/25 bg-accent-deep/20 p-5 sm:p-6">
-              <p className="eyebrow">Use verified information</p>
-              <h2 className="mt-2 text-xl font-medium text-cream">Double-check every detail.</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
+            <section className="band-dark rounded-2xl bg-navy p-5 text-paper shadow-sm sm:p-6">
+              <h2 className="text-xl font-medium text-paper">Double-check every detail.</h2>
+              <p className="mt-2 text-[15px] leading-6 text-paper/80">
                 Program requirements can change from year to year. Confirm your selection, deadline
                 and prerequisites in the official portals before submitting.
               </p>
@@ -390,7 +386,7 @@ export default function Planner() {
                 href="https://www.ouac.on.ca/"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sage hover:underline"
               >
                 Visit OUAC <ExternalLink className="h-4 w-4" />
               </a>
