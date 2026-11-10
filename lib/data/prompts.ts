@@ -167,3 +167,11 @@ export const PROGRAM_GROUPS = [
 export function getSimulatorProgram(code: string): SimulatorProgram | undefined {
   return SIMULATOR_PROGRAMS.find((p) => p.code === code);
 }
+
+/** Spoken-interview questions that fit any program; used to round out a program's own prompts. */
+export const GENERIC_INTERVIEW_QUESTIONS = [
+  'Why this program, and what have you done so far to test that interest?',
+  'Tell us about a time you disagreed with someone you were working with. What did you do?',
+  'Describe a commitment outside class that you stuck with when it got hard. What did it cost you?',
+  'What is one thing you would change about your own approach to learning, and what are you doing about it?',
+];

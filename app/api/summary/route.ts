@@ -1,94 +1,50 @@
 import { NextResponse } from 'next/server';
-import { generateJSON, getPersona } from '@/lib/ai';
-import { getSessionUser, getSupabaseAdmin } from '@/lib/supabase/server';
+import { generateJSON } from '@/lib/ai';
+import { quotaBlock, recordUsage, releaseUsage } from '@/lib/quota';
+import { getSessionUser } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const SUMMARY_HOURLY_LIMIT = 20;
-
-const SCHEMA = {
-  type: 'OBJECT',
-  properties: {
-    summary: {
-      type: 'STRING',
-      description: 'Three to four sentences. The overall read on the applicant.',
-    },
-    strengths: {
-      type: 'ARRAY',
-      items: { type: 'STRING' },
-      description: 'Up to four bullets on where the applicant is genuinely strong.',
-    },
-    focusAreas: {
-      type: 'ARRAY',
-      items: { type: 'STRING' },
-      description: 'Up to four bullets on where marks are being lost.',
-    },
-    actions: {
-      type: 'ARRAY',
-      items: { type: 'STRING' },
-      description: 'Exactly three concrete actions for the coming week.',
-    },
-  },
-  required: ['summary', 'strengths', 'focusAreas', 'actions'],
-};
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  const user = await getSessionUser(req.headers.get('authorization'));
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json().catch(() => null);
+  const stats = body?.stats;
+  if (!stats || typeof stats !== 'object' || JSON.stringify(stats).length > 8_000) {
+    return NextResponse.json({ error: 'stats are required' }, { status: 400 });
+  }
+
+  let usageId: number | null = null;
   try {
-    const user = await getSessionUser(req.headers.get('authorization'));
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const block = await quotaBlock(user.id, 'ai');
+    if (block) return NextResponse.json({ error: block.message }, { status: block.status });
+    usageId = await recordUsage(user.id, 'ai');
 
-    const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const { count } = await getSupabaseAdmin()
-      .from('summary_usage')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', since);
-    if ((count ?? 0) >= SUMMARY_HOURLY_LIMIT) {
-      return NextResponse.json(
-        { error: 'Too many breakdowns. Try again later.' },
-        { status: 429 }
-      );
+    const result = await generateJSON<{ summary: string; strengths: string[]; focusAreas: string[]; actions: string[] }>(
+      `Review this applicant's practice record from Accepted!. Every score came from earlier evaluations (50 is typical, 75 is strong, 90+ is rare).
+
+Practice record: ${JSON.stringify(stats)}
+
+Tie every point to the data. Do not give a pep talk.
+
+Return JSON only, in exactly this shape:
+{"summary":"three sentences: where they are and the one pattern behind most scores","strengths":["at most 3 short points"],"focusAreas":["at most 3 short points on where marks are lost"],"actions":["exactly three concrete actions for next week, highest impact first"]}`,
+      600
+    );
+    if (typeof result.summary !== 'string' || !Array.isArray(result.actions)) {
+      throw new Error('The breakdown was not in the expected format.');
     }
-    await getSupabaseAdmin().from('summary_usage').insert({ user_id: user.id });
-
-    const body = await req.json().catch(() => null);
-    const stats = body?.stats;
-    if (!stats || typeof stats !== 'object' || JSON.stringify(stats).length > 20_000) {
-      return NextResponse.json({ error: 'stats are required' }, { status: 400 });
-    }
-
-    const prompt = `${getPersona()}
-
----
-
-You are reviewing an applicant's practice record from the Accepted! platform. The
-data below is real: every score came from your own evaluations of their answers.
-
-Practice record:
-\`\`\`json
-${JSON.stringify(stats, null, 2)}
-\`\`\`
-
-Write the breakdown the applicant needs — not a pep talk.
-
-- summary: the overall read. Where are they, and what is the one pattern that
-  explains most of their scores?
-- strengths: what is genuinely working, tied to the data.
-- focusAreas: where marks are being lost, tied to the data.
-- actions: exactly three concrete things to do next week, ordered by impact.
-
-No fluff. No praise. Clear English. Return the JSON only.`;
-
-    const result = await generateJSON<{
-      summary: string;
-      strengths: string[];
-      focusAreas: string[];
-      actions: string[];
-    }>(prompt, SCHEMA);
-
-    return NextResponse.json(result);
+    return NextResponse.json({
+      summary: result.summary.slice(0, 800),
+      strengths: (result.strengths ?? []).filter((s) => typeof s === 'string').slice(0, 3),
+      focusAreas: (result.focusAreas ?? []).filter((s) => typeof s === 'string').slice(0, 3),
+      actions: result.actions.filter((s) => typeof s === 'string').slice(0, 3),
+    });
   } catch (e) {
+    await releaseUsage(usageId).catch(() => undefined);
     console.error('Summary failed:', e);
     return NextResponse.json({ error: 'Could not generate the breakdown. Try again.' }, { status: 500 });
   }

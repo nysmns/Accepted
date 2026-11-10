@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { drainQueue, dailyUsage } from '@/lib/queue';
+import { drainQueue } from '@/lib/queue';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,6 +22,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const result = await drainQueue();
-  return NextResponse.json({ ...result, usage: await dailyUsage() });
+  return NextResponse.json({ processed: await drainQueue() });
 }

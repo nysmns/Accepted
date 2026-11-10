@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser, getSupabaseAdmin } from '@/lib/supabase/server';
+import { toList } from '@/lib/queue';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,9 @@ export async function GET(req: Request) {
 
   if (error) return NextResponse.json({ error: 'Could not load history.' }, { status: 500 });
 
-  return NextResponse.json({ jobs: data ?? [] });
+  return NextResponse.json({
+    jobs: (data ?? []).map((j) => ({ ...j, strengths: toList(j.strengths), fixes: toList(j.fixes) })),
+  });
 }
 
 /** Delete the signed-in user's practice history. */

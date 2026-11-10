@@ -36,7 +36,7 @@ export async function authFetch(path: string, options: RequestInit = {}): Promis
   return fetch(path, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: token } : {}),
       ...(options.headers ?? {}),
     },

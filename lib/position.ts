@@ -20,20 +20,20 @@ export function academicPosition(average: number, label: string) {
     return {
       title: 'Above the listed reference range',
       description: 'Your current average is above this broad reference point.',
-      tone: 'text-accent',
+      tone: 'text-moss',
     };
   }
   if (average >= low - 2) {
     return {
       title: 'Near the listed reference range',
       description: 'Your current average is close to this broad reference point.',
-      tone: 'text-cream',
+      tone: 'text-navy',
     };
   }
   return {
     title: 'Below the listed reference range',
     description: 'Your current average is below this broad reference point.',
-    tone: 'text-rose',
+    tone: 'text-brick',
   };
 }
 

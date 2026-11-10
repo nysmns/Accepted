@@ -1,12 +1,10 @@
 import { after, NextResponse } from 'next/server';
 import { getSessionUser, getSupabaseAdmin } from '@/lib/supabase/server';
-import { dailyUsage, drainQueue } from '@/lib/queue';
+import { drainQueue, toList } from '@/lib/queue';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
-
-const DAILY_CAP = Number(process.env.GEMINI_DAILY_CAP || 250);
 
 /** Read a job's status without doing background scoring work in the polling request. */
 export async function GET(
@@ -59,26 +57,17 @@ export async function GET(
     });
   }
 
-  try {
-    return NextResponse.json({
-      id: data.id,
-      status: data.status,
-      position,
-      capReached:
-        data.status === 'queued' || data.status === 'processing'
-          ? (await dailyUsage()) >= DAILY_CAP
-          : false,
-      score: data.score,
-      verdict: data.verdict,
-      strengths: data.strengths,
-      fixes: data.fixes,
-      rewrite: data.rewrite,
-      error: data.error,
-      attempts: data.attempts,
-      createdAt: data.created_at,
-    });
-  } catch (issue) {
-    console.error('Could not read feedback queue usage:', issue);
-    return NextResponse.json({ error: 'Could not load evaluation status.' }, { status: 503 });
-  }
+  return NextResponse.json({
+    id: data.id,
+    status: data.status,
+    position,
+    score: data.score,
+    verdict: data.verdict,
+    strengths: toList(data.strengths),
+    fixes: toList(data.fixes),
+    rewrite: data.rewrite,
+    error: data.error,
+    attempts: data.attempts,
+    createdAt: data.created_at,
+  });
 }
