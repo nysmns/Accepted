@@ -70,10 +70,10 @@ export default function HistoryPanel() {
       onClick={() => toggleSort(key)}
       aria-sort={sort.key === key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined}
       title={`Sort by ${label.toLowerCase()}`}
-      className={`cursor-pointer select-none whitespace-nowrap px-4 py-3 font-semibold transition hover:text-cream ${className}`}
+      className={`cursor-pointer select-none whitespace-nowrap px-4 py-3 font-semibold transition hover:text-deep ${className}`}
     >
       {label}
-      <span className="ml-1 inline-block w-3 text-accent">
+      <span className="ml-1 inline-block w-3 text-moss">
         {sort.key === key ? (sort.dir === 'asc' ? '↑' : '↓') : ''}
       </span>
     </th>
@@ -100,7 +100,7 @@ export default function HistoryPanel() {
 
   if (error) {
     return (
-      <div className="panel p-10 text-center text-sm text-rose" role="alert">
+      <div className="panel p-10 text-center text-sm text-brick" role="alert">
         {error}
       </div>
     );
@@ -109,7 +109,7 @@ export default function HistoryPanel() {
   if (!data) {
     return (
       <div className="panel flex items-center justify-center gap-3 p-16 text-sm text-muted" role="status">
-        <Loader2 className="h-5 w-5 animate-spin text-accent" />
+        <Loader2 className="h-5 w-5 animate-spin text-moss" />
         Loading historical averages…
       </div>
     );
@@ -124,11 +124,11 @@ export default function HistoryPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-px border border-line bg-line lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px bg-sand lg:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="bg-panel p-5">
+          <div key={s.label} className="bg-surface p-5">
             <p className="eyebrow">{s.label}</p>
-            <p className="mt-2 font-display text-2xl font-semibold text-cream">{s.value}</p>
+            <p className="mt-2 font-display text-2xl font-semibold text-deep">{s.value}</p>
           </div>
         ))}
       </div>
@@ -176,10 +176,10 @@ export default function HistoryPanel() {
           not an admission guarantee.
         </p>
 
-        <div className="mt-4 rounded-lg border border-line">
+        <div className="mt-4 rounded-lg">
           <table className="w-full text-sm">
-            <thead className="sticky top-16 z-10 bg-ink">
-              <tr className="border-b border-line text-left text-xs text-muted">
+            <thead className="sticky top-16 z-10 bg-sand">
+              <tr className="text-left text-xs text-muted">
                 {sortHeader('university', 'University', 'hidden sm:table-cell')}
                 {sortHeader('program', 'Program')}
                 {sortHeader('offers', 'Offers', 'text-right')}
@@ -192,17 +192,17 @@ export default function HistoryPanel() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-navy/10">
               {rows.map((p) => (
-                <tr key={`${p.university}-${p.program}`} className="transition hover:bg-panel-2/50">
+                <tr key={`${p.university}-${p.program}`} className="transition hover:bg-sand/50">
                   <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted sm:table-cell">{p.university}</td>
-                  <td className="px-4 py-3 font-medium text-cream">{p.program}</td>
-                  <td className="px-4 py-3 text-right font-mono text-xs text-muted">{p.offers}</td>
+                  <td className="px-4 py-3 font-medium text-deep">{p.program}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-xs text-muted">{p.offers}</td>
                   <td
-                    className={`px-4 py-3 text-right font-mono text-base font-semibold ${
+                    className={`px-4 py-3 text-right tabular-nums text-base font-semibold ${
                       p.offers < 5
                         ? 'text-muted underline decoration-dotted decoration-muted/60 underline-offset-4'
-                        : 'text-accent'
+                        : 'text-moss'
                     }`}
                     title={
                       p.offers < 5
@@ -212,10 +212,10 @@ export default function HistoryPanel() {
                   >
                     {p.average.toFixed(1)}%
                   </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-right font-mono text-xs text-muted md:table-cell">
+                  <td className="hidden whitespace-nowrap px-4 py-3 text-right tabular-nums text-xs text-muted md:table-cell">
                     {p.low.toFixed(1)}%–{p.high.toFixed(1)}%
                   </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-center font-mono text-xs text-muted lg:table-cell">
+                  <td className="hidden whitespace-nowrap px-4 py-3 text-center tabular-nums text-xs text-muted lg:table-cell">
                     {p.byYear
                       .slice(-3)
                       .map((y) => `${y.year} ${y.average.toFixed(1)}`)

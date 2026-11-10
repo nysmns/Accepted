@@ -40,8 +40,8 @@ const MAX_WORDS = 500;
 const MAX_CHARS = 4000;
 
 const FORMATS: Record<Format, { label: string; prep: number; response: number }> = {
-  written: { label: 'Written essay / AIF (60s prep / 10 min write)', prep: 60, response: 600 },
-  video: { label: 'Video response (30s prep / 2 min speak)', prep: 30, response: 120 },
+  written: { label: 'Written essay / AIF (10 min)', prep: 60, response: 600 },
+  video: { label: 'Spoken response (2 min)', prep: 30, response: 120 },
 };
 
 type Feedback = {
@@ -376,8 +376,7 @@ export default function Simulator() {
       {/* Configuration */}
       <aside className="panel h-fit space-y-5 p-5">
         <div>
-          <p className="eyebrow">Practice setup</p>
-          <h2 className="mt-2 text-xl font-medium text-cream">Configuration</h2>
+          <h2 className="mt-2 text-xl font-medium text-deep">Configuration</h2>
         </div>
 
         <div>
@@ -435,8 +434,8 @@ export default function Simulator() {
       <section className="panel flex min-h-[480px] flex-col p-6">
         {phase === 'idle' && (
           <div className="my-auto space-y-3 text-center">
-            <GraduationCap className="mx-auto h-10 w-10 text-accent" />
-            <h3 className="text-xl font-medium text-cream">Choose a program and format</h3>
+            <GraduationCap className="mx-auto h-10 w-10 text-moss" />
+            <h3 className="text-xl font-medium text-deep">Choose a program and format</h3>
             <p className="mx-auto max-w-md text-sm leading-6 text-muted">
               Work through representative questions with strict prep and response timers.
               Confirm current application details with your chosen program.
@@ -446,12 +445,12 @@ export default function Simulator() {
 
         {(phase === 'prep' || phase === 'response') && (
           <div className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-4">
               <span
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
                   phase === 'prep'
-                    ? 'border-accent/40 bg-accent/10 text-accent'
-                    : 'border-rose/40 bg-rose/10 text-rose'
+                    ? ' bg-sage/30 text-moss'
+                    : ' bg-brick-soft text-brick'
                 }`}
               >
                 {phase === 'prep'
@@ -460,14 +459,13 @@ export default function Simulator() {
                     ? 'Writing window'
                     : 'Response time'}
               </span>
-              <div className="font-mono text-2xl font-semibold tabular-nums text-cream">
+              <div className="tabular-nums text-2xl font-semibold tabular-nums text-deep">
                 {mins}:{secs}
               </div>
             </div>
 
             <div className="space-y-2">
-              <p className="eyebrow">Practice prompt</p>
-              <div className="rounded-lg border border-line bg-ink p-4 text-base leading-7 text-cream">
+              <div className="rounded-lg bg-sand p-4 text-base leading-7 text-deep">
                 {prompt}
               </div>
               <p className="text-xs text-muted">
@@ -486,17 +484,17 @@ export default function Simulator() {
                     className="input min-h-[180px] resize-y leading-6"
                   />
                   <div className="flex items-center justify-between text-xs">
-                    <span className={overLimit ? 'font-medium text-rose' : 'text-muted'}>
+                    <span className={overLimit ? 'font-medium text-brick' : 'text-muted'}>
                       {words} / {MAX_WORDS} words
                     </span>
                     {overLimit && (
-                      <span className="text-rose">Over the limit — trim before submitting.</span>
+                      <span className="text-brick">Over the limit — trim before submitting.</span>
                     )}
                   </div>
                 </>
               ) : (
-                <div className="space-y-3 rounded-lg border border-line bg-ink p-8 text-center">
-                  <Video className="mx-auto h-8 w-8 animate-pulse text-accent" />
+                <div className="space-y-3 rounded-lg bg-sand p-8 text-center">
+                  <Video className="mx-auto h-8 w-8 animate-pulse text-moss" />
                   <p className="mx-auto max-w-md text-sm leading-6 text-muted">
                     Use this window to practise aloud. This timer does not record audio. For
                     transcription and scored feedback, use the mock interview.
@@ -506,7 +504,7 @@ export default function Simulator() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 border-l-2 border-rose bg-rose/10 px-4 py-3 text-sm text-rose">
+              <div className="flex items-center gap-2 border-l-4 border-brick bg-brick-soft px-4 py-3 text-sm text-brick">
                 <MessageSquareWarning className="h-4 w-4 shrink-0" />
                 {error}
               </div>
@@ -529,8 +527,8 @@ export default function Simulator() {
 
         {phase === 'waiting' && (
           <div className="my-auto space-y-4 text-center">
-            <Loader2 className="mx-auto h-10 w-10 animate-spin text-accent" />
-            <h3 className="text-xl font-medium text-cream">
+            <Loader2 className="mx-auto h-10 w-10 animate-spin text-moss" />
+            <h3 className="text-xl font-medium text-deep">
               {queuePosition === null ? 'Scoring your answer…' : `Queued — position #${queuePosition}`}
             </h3>
             <p className="mx-auto max-w-md text-sm leading-6 text-muted">
@@ -538,14 +536,14 @@ export default function Simulator() {
                 ? 'Today’s free scoring limit is reached. Your answer stays in the queue and will be scored when the limit resets.'
                 : 'This usually takes a few seconds. Your result will appear here when it is ready.'}
             </p>
-            {error && <p role="status" className="mx-auto max-w-md text-xs text-gold">{error}</p>}
+            {error && <p role="status" className="mx-auto max-w-md text-xs text-brick">{error}</p>}
           </div>
         )}
 
         {phase === 'feedback' && feedback && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              <span className="rounded-full bg-sage/30 px-3 py-1 text-xs font-medium text-moss">
                 Nova&apos;s evaluation
               </span>
               <button onClick={reset} className="btn-ghost">
@@ -553,30 +551,30 @@ export default function Simulator() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 border-b border-line pb-6">
+            <div className="flex flex-wrap items-center gap-6 pb-6">
               <ScoreRing score={feedback.score} />
               <div className="min-w-0 flex-1">
                 <h3 className="eyebrow">Verdict</h3>
-                <p className="mt-2 text-base leading-7 text-cream">{feedback.verdict}</p>
+                <p className="mt-2 text-base leading-7 text-deep">{feedback.verdict}</p>
               </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <h4 className="flex items-center gap-2 text-sm font-semibold text-cream">
-                  <Check className="h-4 w-4 text-accent" /> What works
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-deep">
+                  <Check className="h-4 w-4 text-moss" /> What works
                 </h4>
-                <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-cream/90">
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-deep/90">
                   {feedback.strengths.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h4 className="flex items-center gap-2 text-sm font-semibold text-cream">
-                  <ArrowRight className="h-4 w-4 text-gold" /> What to fix
+                <h4 className="flex items-center gap-2 text-sm font-semibold text-deep">
+                  <ArrowRight className="h-4 w-4 text-brick" /> What to fix
                 </h4>
-                <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-cream/90">
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-deep/90">
                   {feedback.fixes.map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
@@ -585,16 +583,16 @@ export default function Simulator() {
             </div>
 
             <div>
-              <h4 className="text-sm font-semibold text-cream">Model rewrite</h4>
-              <p className="mt-3 whitespace-pre-wrap border-l-2 border-accent bg-ink p-4 text-base leading-7 text-cream">
+              <h4 className="text-sm font-semibold text-deep">Model rewrite</h4>
+              <p className="mt-3 whitespace-pre-wrap border-l-2 border-moss bg-sand p-4 text-base leading-7 text-deep">
                 {feedback.rewrite}
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
               <Link
                 href="/analytics"
-                className="flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+                className="flex items-center gap-2 text-sm font-semibold text-moss hover:underline"
               >
                 See it in your analytics <ArrowRight className="h-4 w-4" />
               </Link>
@@ -604,7 +602,7 @@ export default function Simulator() {
                     {quota.used} of {quota.limit} free evaluations used today
                   </span>
                 )}
-                <span className="flex items-center gap-1 text-accent">
+                <span className="flex items-center gap-1 text-moss">
                   <Check className="h-3.5 w-3.5" /> Saved to your account
                 </span>
               </div>
@@ -614,10 +612,10 @@ export default function Simulator() {
 
         {phase === 'done' && (
           <div className="my-auto space-y-4 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-accent/40 bg-accent/10 text-xl text-accent">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sage/30 text-xl text-moss">
               <Check className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-medium text-cream">Simulation completed</h3>
+            <h3 className="text-2xl font-medium text-deep">Simulation completed</h3>
             <p className="mx-auto max-w-md text-sm leading-6 text-muted">
               Written answers are scored by Nova. For spoken answers with transcription and
               feedback, use the mock interview.

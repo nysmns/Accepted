@@ -1,26 +1,20 @@
 import type { Metadata } from 'next';
-import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
+import { Newsreader, Public_Sans } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
 import Nav from '@/components/nav';
 import Footer from '@/components/footer';
 import Analytics from '@/components/analytics';
 
-const fraunces = Fraunces({
+const newsreader = Newsreader({
   subsets: ['latin'],
-  variable: '--font-fraunces',
+  variable: '--font-newsreader',
   display: 'swap',
 });
 
-const inter = Inter({
+const publicSans = Public_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const jbMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jbmono',
+  variable: '--font-public',
   display: 'swap',
 });
 
@@ -37,7 +31,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable} ${jbMono.variable}`}>
+    <html lang="en" className={`${newsreader.variable} ${publicSans.variable}`}>
       <body className="flex min-h-screen flex-col">
         <AuthProvider>
           <Nav />

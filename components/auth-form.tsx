@@ -59,12 +59,12 @@ export default function AuthForm() {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-ink p-1 text-sm">
+      <div className="grid grid-cols-2 gap-1 rounded-lg bg-sand p-1 text-sm">
         <button
           type="button"
           onClick={() => setMode('signin')}
           className={`rounded-md py-2 transition ${
-            mode === 'signin' ? 'bg-panel-2 font-semibold text-cream' : 'text-muted'
+            mode === 'signin' ? 'bg-sand font-semibold text-deep' : 'text-muted'
           }`}
         >
           Sign in
@@ -73,7 +73,7 @@ export default function AuthForm() {
           type="button"
           onClick={() => setMode('signup')}
           className={`rounded-md py-2 transition ${
-            mode === 'signup' ? 'bg-panel-2 font-semibold text-cream' : 'text-muted'
+            mode === 'signup' ? 'bg-sand font-semibold text-deep' : 'text-muted'
           }`}
         >
           Create account
@@ -92,7 +92,7 @@ export default function AuthForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@school.ca"
-            className="w-full rounded-lg border border-line bg-ink px-3 py-2.5 text-sm text-cream outline-none focus:border-accent"
+            className="w-full rounded-lg bg-sand px-3 py-2.5 text-sm text-deep outline-none focus:ring-2 focus:ring-moss"
           />
         </div>
         <div>
@@ -107,7 +107,7 @@ export default function AuthForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 6 characters"
-            className="w-full rounded-lg border border-line bg-ink px-3 py-2.5 text-sm text-cream outline-none focus:border-accent"
+            className="w-full rounded-lg bg-sand px-3 py-2.5 text-sm text-deep outline-none focus:ring-2 focus:ring-moss"
           />
         </div>
 
@@ -116,7 +116,7 @@ export default function AuthForm() {
             <button
               type="button"
               onClick={forgotPassword}
-              className="text-xs text-muted transition hover:text-accent-soft"
+              className="text-xs text-muted transition hover:text-moss"
             >
               Forgot password?
             </button>
@@ -124,12 +124,12 @@ export default function AuthForm() {
         )}
 
         {error && (
-          <p className="border-l-2 border-rose bg-rose/10 px-3 py-2 text-sm text-rose">
+          <p className="border-l-4 border-brick bg-brick-soft px-3 py-2 text-sm text-brick">
             {error}
           </p>
         )}
         {info && (
-          <p className="border-l-2 border-accent bg-accent/10 px-3 py-2 text-sm text-accent-soft">
+          <p className="border-l-2 border-moss bg-sage/30 px-3 py-2 text-sm text-moss">
             {info}
           </p>
         )}
@@ -137,7 +137,7 @@ export default function AuthForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-accent py-2.5 text-sm font-medium text-ink transition hover:bg-accent-soft disabled:opacity-60"
+          className="w-full rounded-lg bg-navy py-2.5 text-sm font-medium text-paper transition hover:bg-deep disabled:opacity-60"
         >
           {loading
             ? 'Please wait…'

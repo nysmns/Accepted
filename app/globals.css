@@ -1,46 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  /* Academic navy base, brass accent, cool paper text. */
-  --color-ink: #0a1a2e;
-  --color-panel: #122a47;
-  --color-panel-2: #173453;
-  --color-line: #2d4f78;
-  --color-cream: #eaf0f7;
-  --color-muted: #a9bed8;
-  --color-accent: #d9a94e;
-  --color-accent-deep: #2b2317;
-  --color-accent-soft: #e7c684;
-  --color-gold: #d9a94e;
-  --color-rose: #e08b8b;
-  --color-mortuum: #5e1f24;
-  --color-slate: #617891;
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jbmono), ui-monospace, "SFMono-Regular", monospace;
+  /* Cream page, deep-navy bands, moss and sage for support. Each role has one colour. */
+  --color-paper: #f5f1e6;
+  --color-surface: #fcfaf4;
+  --color-sand: #e9e3d1;
+  --color-deep: #071b2d;
+  --color-navy: #1f3455;
+  --color-moss: #4c6a5a;
+  --color-sage: #a3b18a;
+  --color-muted: #56627a;
+  --color-brick: #8c3b35;
+  --color-brick-soft: #f1dad6;
+  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-public), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    background: var(--color-ink);
+    background: var(--color-paper);
   }
   body {
-    @apply bg-ink font-sans text-cream antialiased;
+    @apply bg-paper font-sans text-base leading-7 text-deep antialiased;
   }
   ::selection {
-    background: #d9a94e;
-    color: #0a1a2e;
+    background: var(--color-sage);
+    color: var(--color-deep);
   }
   h1,
   h2,
   h3 {
-    @apply font-display;
+    @apply font-display font-medium;
     text-wrap: balance;
   }
+  p {
+    text-wrap: pretty;
+  }
   :focus-visible {
-    outline: 3px solid #d9a94e;
-    outline-offset: 2px;
+    outline: 3px solid var(--color-moss);
+    outline-offset: 3px;
+  }
+  .band-dark :focus-visible {
+    outline-color: var(--color-sage);
   }
   button,
   a,
@@ -61,26 +63,39 @@
   }
 }
 
+/* Class names below are kept from the previous theme so existing components keep working. */
 @layer components {
-  .eyebrow {
-    @apply text-xs font-semibold tracking-[0.08em] text-muted;
-  }
+  .card,
   .panel {
-    @apply rounded-xl border border-line bg-panel shadow-sm;
+    @apply rounded-2xl bg-surface shadow-[0_1px_2px_rgba(7,27,45,0.06),0_10px_28px_-10px_rgba(7,27,45,0.16)];
   }
-  .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-ink transition hover:bg-accent-soft disabled:cursor-not-allowed disabled:opacity-50;
-  }
-  .btn-ghost {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-panel px-4 text-sm font-medium text-cream transition hover:border-accent/50 hover:bg-panel-2 disabled:cursor-not-allowed disabled:opacity-50;
-  }
+  .field,
   .input {
-    @apply w-full rounded-lg border border-line bg-ink px-3 py-2.5 text-sm text-cream outline-none transition placeholder:text-muted/70 focus:border-accent;
+    @apply w-full rounded-lg bg-sand px-3.5 py-3 text-[15px] text-deep outline-none placeholder:text-muted focus:ring-2 focus:ring-moss;
   }
   .label {
-    @apply mb-1.5 block text-xs font-medium text-muted;
+    @apply mb-1.5 block text-sm font-medium text-deep;
+  }
+  .eyebrow {
+    @apply text-sm font-medium text-moss;
   }
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1 text-xs font-medium text-muted;
+    @apply inline-flex items-center gap-1.5 rounded-md bg-sage/40 px-2.5 py-1 text-sm font-medium text-deep;
+  }
+  .btn-primary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 bg-navy text-paper shadow-sm hover:bg-deep;
+  }
+  .btn-quiet,
+  .btn-ghost {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 bg-sand text-navy hover:bg-sage/50;
+  }
+  .btn-light {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 bg-sage text-deep hover:bg-paper;
+  }
+  .btn-danger {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-6 text-[15px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 bg-brick text-paper hover:opacity-90;
+  }
+  .notice {
+    @apply flex items-start gap-3 rounded-lg bg-brick-soft px-4 py-3 text-[15px] leading-6 text-brick;
   }
 }
