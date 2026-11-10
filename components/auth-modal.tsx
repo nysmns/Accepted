@@ -21,23 +21,23 @@ export default function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-paper/80 p-4 backdrop-blur-sm"
       onClick={closeAuth}
     >
       <div
-        className="panel w-full max-w-sm p-6"
+        className="card w-full max-w-sm p-6"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-lg font-semibold text-cream">
+          <h2 className="font-display text-lg font-semibold text-deep">
             Sign in to Accepted!
           </h2>
           <button
             onClick={closeAuth}
             aria-label="Close"
-            className="text-muted transition hover:text-cream"
+            className="text-muted transition hover:text-deep"
           >
             <X className="h-5 w-5" />
           </button>

@@ -6,7 +6,7 @@ export default function ScoreRing({ score, size = 92 }: { score: number; size?: 
   const offset = c - (clamped / 100) * c;
 
   const tone =
-    clamped >= 75 ? 'text-accent' : clamped >= 55 ? 'text-gold' : 'text-rose';
+    clamped >= 75 ? 'text-moss' : clamped >= 55 ? 'text-navy' : 'text-brick';
 
   return (
     <div
@@ -19,7 +19,7 @@ export default function ScoreRing({ score, size = 92 }: { score: number; size?: 
           cy={size / 2}
           r={r}
           strokeWidth={stroke}
-          className="stroke-line"
+          className="stroke-sand"
           fill="none"
         />
         <circle
@@ -36,10 +36,8 @@ export default function ScoreRing({ score, size = 92 }: { score: number; size?: 
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-        <span className="font-display text-2xl font-semibold text-cream">{clamped}</span>
-        <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted">
-          score
-        </span>
+        <span className="font-display text-2xl font-semibold text-deep">{clamped}</span>
+        <span className="mt-1 text-xs text-muted">score</span>
       </div>
     </div>
   );

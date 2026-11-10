@@ -127,8 +127,8 @@ export default function AnalyticsDashboard() {
 
   if (!user) {
     return (
-      <div className="panel px-6 py-16 text-center">
-        <p className="font-display text-2xl font-semibold text-cream">
+      <div className="card px-6 py-16 text-center">
+        <p className="font-display text-2xl font-semibold text-deep">
           Sign in to see your analytics
         </p>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
@@ -136,7 +136,7 @@ export default function AnalyticsDashboard() {
         </p>
         <button
           onClick={openAuth}
-          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-accent-soft"
+          className="btn-primary mt-6"
         >
           Sign in <ArrowRight className="h-4 w-4" />
         </button>
@@ -150,14 +150,14 @@ export default function AnalyticsDashboard() {
 
   if (!stats || stats.total === 0) {
     return (
-      <div className="panel px-6 py-16 text-center">
-        <p className="font-display text-2xl font-semibold text-cream">No attempts yet</p>
+      <div className="card px-6 py-16 text-center">
+        <p className="font-display text-2xl font-semibold text-deep">No attempts yet</p>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
           Answer one supplemental question and Nova will start building your breakdown.
         </p>
         <Link
           href="/simulator"
-          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-accent-soft"
+          className="btn-primary mt-6"
         >
           Start practicing <ArrowRight className="h-4 w-4" />
         </Link>
@@ -169,10 +169,9 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-6">
         <div>
-          <p className="eyebrow">Nova Analytics</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-cream">
+          <h1 className="mt-2 font-display text-3xl font-semibold text-deep">
             Your progress
           </h1>
           <p className="mt-1 text-sm text-muted">
@@ -184,7 +183,7 @@ export default function AnalyticsDashboard() {
           <button
             onClick={askNova}
             disabled={loadingSummary}
-            className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-accent-soft disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-sm font-medium text-paper transition hover:bg-deep disabled:opacity-60"
           >
             {loadingSummary ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,7 +194,7 @@ export default function AnalyticsDashboard() {
           </button>
           <button
             onClick={clearHistory}
-            className="flex items-center gap-2 rounded-lg border border-line bg-panel px-4 py-2.5 text-sm text-muted transition hover:text-rose"
+            className="flex items-center gap-2 rounded-lg bg-surface px-4 py-2.5 text-sm text-muted transition hover:text-brick"
           >
             <Trash2 className="h-4 w-4" />
             Clear
@@ -203,7 +202,7 @@ export default function AnalyticsDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-px border border-line bg-line md:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {[
           { label: 'Answers scored', value: String(stats.total) },
           { label: 'Average score', value: String(stats.avgScore) },
@@ -213,33 +212,33 @@ export default function AnalyticsDashboard() {
             value: stats.weakest ? stats.weakest.program : '—',
           },
         ].map((s) => (
-          <div key={s.label} className="bg-panel p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
+          <div key={s.label} className="card p-5">
+            <p className="text-sm text-muted">
               {s.label}
             </p>
-            <p className="mt-2 font-display text-xl font-semibold text-cream">{s.value}</p>
+            <p className="mt-2 font-display text-xl font-semibold text-deep">{s.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr]">
-        <section className="panel p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+        <section className="card p-6">
+          <h2 className="font-display text-xl text-navy">
             Score by program
           </h2>
           <div className="mt-5 space-y-4">
             {stats.perProgram.map((p) => (
               <div key={p.program}>
                 <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-medium text-cream">{p.program}</span>
+                  <span className="font-medium text-deep">{p.program}</span>
                   <span className="text-xs text-muted">
                     {p.count} · avg {p.avg}
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 w-full bg-line">
+                <div className="mt-1.5 h-2 w-full bg-sand">
                   <div
                     className={`h-full ${
-                      p.avg >= 75 ? 'bg-accent' : p.avg >= 55 ? 'bg-gold' : 'bg-rose'
+                      p.avg >= 75 ? 'bg-moss' : p.avg >= 55 ? 'bg-sage' : 'bg-brick'
                     }`}
                     style={{ width: `${(p.avg / maxAvg) * 100}%` }}
                   />
@@ -249,17 +248,17 @@ export default function AnalyticsDashboard() {
           </div>
         </section>
 
-        <section className="panel p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+        <section className="card p-6">
+          <h2 className="font-display text-xl text-navy">
             Last 8 weeks
           </h2>
           <div className="mt-5 flex h-32 items-end gap-2">
             {stats.trend.map((w, i) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-                <div className="flex h-24 w-full items-end bg-ink">
+                <div className="flex h-24 w-full items-end bg-sand">
                   {w.avg !== null ? (
                     <div
-                      className="w-full bg-gold"
+                      className="w-full bg-sage"
                       style={{ height: `${Math.max(w.avg, 4)}%` }}
                       title={`${w.label}: ${w.avg}`}
                     />
@@ -273,43 +272,43 @@ export default function AnalyticsDashboard() {
       </div>
 
       {error && (
-        <div className="border-l-2 border-rose bg-rose/10 px-4 py-3 text-sm text-rose">
+        <div className="border-l-4 border-brick bg-brick-soft px-4 py-3 text-sm text-brick">
           {error}
         </div>
       )}
 
       {summary && (
-        <section className="panel">
-          <div className="border-b border-line p-6">
-            <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-cream">
-              <Sparkles className="h-5 w-5 text-accent-soft" /> Nova&apos;s breakdown
+        <section className="card">
+          <div className="p-6">
+            <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-deep">
+              <Sparkles className="h-5 w-5 text-moss" /> Nova&apos;s breakdown
             </h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-cream/90">
+            <p className="mt-3 text-[15px] leading-relaxed text-deep/90">
               {summary.summary}
             </p>
           </div>
           <div className="grid gap-6 p-6 md:grid-cols-3">
             <div>
-              <h3 className="text-sm font-semibold text-cream">Where you are strong</h3>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-cream/90">
+              <h3 className="text-sm font-semibold text-deep">Where you are strong</h3>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-deep/90">
                 {summary.strengths.map((s, i) => (
                   <li key={i}>{s}</li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-cream">
+              <h3 className="text-sm font-semibold text-deep">
                 Where you are losing marks
               </h3>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-cream/90">
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-deep/90">
                 {summary.focusAreas.map((s, i) => (
                   <li key={i}>{s}</li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-cream">Do next</h3>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-cream/90">
+              <h3 className="text-sm font-semibold text-deep">Do next</h3>
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-deep/90">
                 {summary.actions.map((s, i) => (
                   <li key={i}>{s}</li>
                 ))}
@@ -319,21 +318,21 @@ export default function AnalyticsDashboard() {
         </section>
       )}
 
-      <section className="panel">
-        <h2 className="border-b border-line p-6 text-sm font-semibold uppercase tracking-[0.14em] text-muted">
+      <section className="card">
+        <h2 className="p-6 font-display text-xl text-navy">
           Recent attempts
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-[11px] uppercase tracking-[0.14em] text-muted">
+              <tr className="text-left text-sm text-muted">
                 <th className="px-6 py-3 font-medium">Date</th>
                 <th className="px-6 py-3 font-medium">Question</th>
                 <th className="px-6 py-3 font-medium">Program</th>
                 <th className="px-6 py-3 text-right font-medium">Score</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-navy/10">
               {stats.recent.map((a) => (
                 <tr key={a.id}>
                   <td className="whitespace-nowrap px-6 py-3 text-muted">
@@ -343,10 +342,10 @@ export default function AnalyticsDashboard() {
                     })}
                   </td>
                   <td className="max-w-md px-6 py-3">
-                    <span className="line-clamp-1 text-cream/90">{a.question}</span>
+                    <span className="line-clamp-1 text-deep/90">{a.question}</span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-3 text-muted">{a.program}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-cream">
+                  <td className="px-6 py-3 text-right font-semibold text-deep">
                     {a.feedback.score}
                   </td>
                 </tr>

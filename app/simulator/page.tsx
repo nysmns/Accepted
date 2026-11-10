@@ -10,20 +10,17 @@ export const metadata = {
 
 export default function SimulatorPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <div className="mb-6 rounded-2xl border border-line bg-panel p-6">
-        <div>
-          <h1 className="text-2xl font-bold text-cream">Supplemental Application Practice</h1>
-          <p className="mt-1 max-w-3xl text-sm text-muted">
-            Practise representative supplemental prompts from Ontario program areas
-            under strict timers, with direct coaching on written answers. Prompts are
-            for preparation and are not represented as current or official admissions questions.
-          </p>
-        </div>
-      </div>
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <header className="mb-10 max-w-3xl">
+        <h1 className="text-4xl text-navy sm:text-5xl">Practise a supplemental answer</h1>
+        <p className="mt-4 text-lg leading-8 text-muted">
+          Real-style prompts from Ontario programs, a prep timer, a response timer and a strict score. Prompts are for
+          practice and are not current or official admissions questions.
+        </p>
+      </header>
 
       <RequireAuth what="the practice simulator">
-        <Suspense fallback={<p className="text-muted">Loading the simulator…</p>}>
+        <Suspense fallback={<p className="text-muted">Loading…</p>}>
           <Simulator />
         </Suspense>
       </RequireAuth>

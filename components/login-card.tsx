@@ -16,11 +16,11 @@ export default function LoginCard() {
       <div className="space-y-4 text-center">
         <p className="text-sm text-muted">
           You&apos;re signed in as{' '}
-          <span className="font-medium text-cream">{user.email}</span>.
+          <span className="font-medium text-deep">{user.email}</span>.
         </p>
         <Link
           href="/"
-          className="inline-flex items-center justify-center rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-accent-soft"
+          className="btn-primary"
         >
           Back to home
         </Link>
