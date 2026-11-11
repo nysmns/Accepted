@@ -11,16 +11,16 @@ export const metadata = {
 
 export default function SimulatorPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-      <header className="mb-6">
-        <h1 className="text-2xl font-medium text-deep sm:text-3xl">
-          Supplemental Application Practice
-        </h1>
-        <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
-          Practise representative supplemental prompts from Ontario program areas under strict
-          timers, with direct coaching on written answers. Prompts are for preparation and are not
-          represented as current or official admissions questions.
-        </p>
+    <div className="workspace-page">
+      <header className="page-heading">
+        <div>
+          <p className="eyebrow">Prepare / Practice studio</p>
+          <h1>Find your words. Build your confidence.</h1>
+          <p className="page-description">
+            Realistic timers. Representative prompts. Specific feedback from Nova. A focused place to
+            prepare for your supplemental applications.
+          </p>
+        </div>
       </header>
 
       <RequireAuth what="the practice simulator">

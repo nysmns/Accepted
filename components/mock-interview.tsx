@@ -315,20 +315,10 @@ export default function MockInterview() {
 
   return (
     <div className="space-y-6">
-      <header className="max-w-3xl">
-        <h1 className="mt-3 text-3xl font-medium leading-tight text-deep sm:text-4xl">
-          Rehearse out loud. Reflect with purpose.
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-          Answer three program-focused questions using your voice or keyboard. Your transcript is
-          reviewed for substance and clarity. Microphone audio is never uploaded to Accepted.
-        </p>
-      </header>
-
       <section className="panel mx-auto max-w-4xl p-5 sm:p-8">
         {phase === 'ready' && (
           <div className="mx-auto max-w-xl py-4">
-            <h2 className="mt-3 text-2xl font-medium text-deep">Set up a short practice round</h2>
+            <h2 className="mt-3 text-2xl font-medium text-foreground">Set up a short practice round</h2>
             <p className="mt-3 text-sm leading-6 text-muted">
               Questions are generated for practice and are not represented as official or leaked
               admissions questions. Use a quiet space and answer from your own experience.
@@ -340,7 +330,7 @@ export default function MockInterview() {
               id="interview-program"
               value={programCode}
               onChange={(event) => setProgramCode(event.target.value)}
-              className="input"
+              className="field"
             >
               {SIMULATOR_PROGRAMS.map((program) => (
                 <option key={program.code} value={program.code}>
@@ -361,7 +351,7 @@ export default function MockInterview() {
 
         {phase === 'loading' && (
           <div className="py-16 text-center" role="status">
-            <p className="text-base font-medium text-deep">Preparing your questions…</p>
+            <p className="text-base font-medium text-foreground">Preparing your questions…</p>
             <p className="mt-2 text-sm text-muted">This can take a few seconds.</p>
           </div>
         )}
@@ -371,14 +361,14 @@ export default function MockInterview() {
             <p className="eyebrow">
               Question {questionIndex + 1} of {questions.length}
             </p>
-            <h2 className="mt-4 text-2xl font-medium leading-snug text-deep sm:text-3xl">
+            <h2 className="mt-4 text-2xl font-medium leading-snug text-foreground sm:text-3xl">
               {currentQuestion}
             </h2>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 onClick={recording ? stopRecording : startRecording}
-                className={recording ? 'btn-ghost  text-brick' : 'btn-primary'}
+                className={recording ? 'btn-ghost  text-danger' : 'btn-primary'}
               >
                 {recording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 {recording ? 'Stop speaking' : 'Answer by voice'}
@@ -403,13 +393,13 @@ export default function MockInterview() {
               maxLength={MAX_CHARS}
               rows={7}
               placeholder="Use a specific example. Explain what you did, why it mattered, and what you learned."
-              className="input min-h-[180px] resize-y leading-6"
+              className="field min-h-[180px] resize-y leading-6"
             />
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className={overLimit ? 'font-medium text-brick' : 'text-muted'}>
+              <span className={overLimit ? 'font-medium text-danger' : 'text-muted'}>
                 {words} / {MAX_WORDS} words
               </span>
-              {overLimit && <span className="text-brick">Over the limit — trim before continuing.</span>}
+              {overLimit && <span className="text-danger">Over the limit — trim before continuing.</span>}
             </div>
 
             <div className="mt-4 flex justify-end">
@@ -427,7 +417,7 @@ export default function MockInterview() {
 
         {phase === 'analyzing' && (
           <div className="py-16 text-center" role="status">
-            <p className="text-base font-medium text-deep">Reviewing your responses…</p>
+            <p className="text-base font-medium text-foreground">Reviewing your responses…</p>
             <p className="mt-2 text-sm text-muted">Your transcript is being assessed against clear practice criteria.</p>
           </div>
         )}
@@ -436,28 +426,28 @@ export default function MockInterview() {
           <div>
             <div className="flex flex-wrap items-start justify-between gap-4 pb-6">
               <div>
-                <h2 className="mt-2 text-2xl font-medium text-deep">A clear next step</h2>
+                <h2 className="mt-2 text-2xl font-medium text-foreground">A clear next step</h2>
               </div>
-              <div className="rounded-xl bg-navy px-5 py-3 text-center">
-                <p className="font-display text-2xl font-semibold text-moss">{review.overallScore}</p>
-                <p className="text-xs text-muted">Practice score</p>
+              <div className="rounded-xl border border-[#3b594a] bg-navigation px-5 py-3 text-center">
+                <p className="font-display text-2xl font-semibold text-[#e3bf87]">{review.overallScore}</p>
+                <p className="text-xs text-[#b5c8bb]">Practice score</p>
               </div>
             </div>
-            <p className="mt-5 text-base leading-7 text-deep">{review.overallAssessment}</p>
+            <p className="mt-5 text-base leading-7 text-foreground">{review.overallAssessment}</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {review.dimensions.map((dimension) => (
-                <article key={dimension.name} className="rounded-lg bg-paper/95 p-4">
+                <article key={dimension.name} className="rounded-lg bg-canvas p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-deep">{dimension.name}</h3>
-                    <span className="tabular-nums text-sm font-semibold text-moss">{dimension.score}</span>
+                    <h3 className="text-sm font-semibold text-foreground">{dimension.name}</h3>
+                    <span className="tabular-nums text-sm font-semibold text-success">{dimension.score}</span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-muted">{dimension.evidence}</p>
-                  <p className="mt-2 text-sm leading-6 text-deep">{dimension.coaching}</p>
+                  <p className="mt-2 text-sm leading-6 text-foreground">{dimension.coaching}</p>
                 </article>
               ))}
             </div>
-            <div className="mt-6 rounded-lg bg-sand p-5">
-              <h3 className="text-sm font-semibold text-deep">For your next attempt</h3>
+            <div className="mt-6 rounded-lg bg-inset p-5">
+              <h3 className="text-sm font-semibold text-foreground">For your next attempt</h3>
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted">
                 {review.nextSteps.map((step, index) => (
                   <li key={index}>{step}</li>
@@ -473,7 +463,7 @@ export default function MockInterview() {
         {error && (
           <div
             role="alert"
-            className="mt-5 rounded-lg bg-brick-soft px-4 py-3 text-sm text-brick"
+            className="mt-5 rounded-lg bg-danger-tint px-4 py-3 text-sm text-danger"
           >
             {error}
           </div>
@@ -481,7 +471,7 @@ export default function MockInterview() {
       </section>
 
       <p className="mx-auto flex max-w-4xl items-start gap-2 text-xs leading-5 text-muted">
-        <Check className="mt-0.5 h-4 w-4 shrink-0 text-moss" />
+        <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
         Feedback is a practice aid, not an admissions decision. Speech recognition is provided by
         your browser platform and may use its own service; only your transcript is sent to Accepted
         for review.

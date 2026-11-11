@@ -155,6 +155,116 @@ export const SIMULATOR_PROGRAMS: SimulatorProgram[] = [
       'What artistic medium or storytelling form lets you express your perspective most effectively, and why?',
     ],
   },
+  {
+    code: 'carleton_comm',
+    label: 'Carleton Commerce (BCom)',
+    group: 'Business & Commerce',
+    university: 'Carleton University',
+    prompts: [
+      'Describe your experience in a business-related context and what you learned from it.',
+      'What do you think are the most important qualities for success in business, and how have you developed them?',
+    ],
+  },
+  {
+    code: 'carleton_journ',
+    label: 'Carleton Journalism (BJ)',
+    group: 'Business & Commerce',
+    university: 'Carleton University',
+    prompts: [
+      'Why do you want to pursue a career in journalism, and how have your experiences prepared you for it?',
+      'Describe a current issue in media or journalism that fascinates you and explain why.',
+    ],
+  },
+  {
+    code: 'carleton_bpapm',
+    label: 'Carleton Public Affairs and Policy (BPAPM)',
+    group: 'Business & Commerce',
+    university: 'Carleton University',
+    prompts: [
+      'Describe a time you influenced change in a community or organization.',
+      'What role should government or policy play in addressing a challenge you care about?',
+    ],
+  },
+  {
+    code: 'carleton_cosms',
+    label: 'Carleton Communication and Media Studies (BCoMS)',
+    group: 'Business & Commerce',
+    university: 'Carleton University',
+    prompts: [
+      'Describe your experience in communications and what you hope to bring to the program.',
+      'How has social media or digital media shaped the way you communicate and think?',
+    ],
+  },
+  {
+    code: 'carleton_bent',
+    label: 'Carleton Entrepreneurship (BEnt)',
+    group: 'Business & Commerce',
+    university: 'Carleton University',
+    prompts: [
+      'Describe a project or idea you started to solve a real problem. What did you learn?',
+      'What does innovation mean to you, and how have you practiced it?',
+    ],
+  },
+  {
+    code: 'carleton_cogsc',
+    label: 'Carleton Cognitive Science (BCogSc)',
+    group: 'Arts, Design & Architecture',
+    university: 'Carleton University',
+    prompts: [
+      'Describe a time your perspective on how people think or learn changed. What caused it?',
+      'How do you think technology will change the way humans learn or communicate?',
+    ],
+  },
+  {
+    code: 'carleton_bid',
+    label: 'Carleton Industrial Design (BID)',
+    group: 'Arts, Design & Architecture',
+    university: 'Carleton University',
+    prompts: [
+      'Describe your experience in design and what draws you to industrial design.',
+      'Design an object that would improve daily life for students. What would it do, and why?',
+    ],
+  },
+  {
+    code: 'carleton_bit',
+    label: 'Carleton Information Technology (BIT)',
+    group: 'Engineering & Computer Science',
+    university: 'Carleton University',
+    prompts: [
+      'Describe a technology project you worked on and what you learned.',
+      'How do you think artificial intelligence should be governed, and why?',
+    ],
+  },
+  {
+    code: 'carleton_bsw',
+    label: 'Carleton Social Work (BSW)',
+    group: 'Health Sciences & Nursing',
+    university: 'Carleton University',
+    prompts: [
+      'Why do you want to study social work, and how have your experiences prepared you?',
+      'Describe a time you supported someone facing a challenge. What did you learn?',
+    ],
+  },
+  {
+    code: 'carleton_nurs',
+    label: 'Carleton Nursing (BScN, RN Prescribing)',
+    group: 'Health Sciences & Nursing',
+    university: 'Carleton University',
+    prompts: [
+      'Why do you want to pursue nursing, and what relevant experiences have you had?',
+      'Describe a time you cared for someone who was unwell. What did it teach you?',
+    ],
+  },
+  {
+    code: 'uottawa_telfer',
+    label: 'uOttawa Telfer Commerce (BCom)',
+    group: 'Business & Commerce',
+    university: 'University of Ottawa',
+    prompts: [
+      'Describe your most meaningful involvement and how it shaped your goals.',
+      'What does responsible management mean to you, and how have you practiced it?',
+    ],
+  },
 ];
 
 export const PROGRAM_GROUPS = [

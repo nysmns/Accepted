@@ -15,13 +15,9 @@ export default function LoginCard() {
     return (
       <div className="space-y-4 text-center">
         <p className="text-sm text-muted">
-          You&apos;re signed in as{' '}
-          <span className="font-medium text-deep">{user.email}</span>.
+          You&apos;re signed in as <span className="font-medium text-foreground">{user.email}</span>.
         </p>
-        <Link
-          href="/"
-          className="inline-flex items-center justify-center rounded-lg bg-navy px-5 py-2.5 text-sm font-medium text-paper transition hover:bg-deep"
-        >
+        <Link href="/" className="btn-primary">
           Back to home
         </Link>
       </div>

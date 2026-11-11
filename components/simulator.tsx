@@ -5,9 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   SIMULATOR_PROGRAMS,
-  PROGRAM_GROUPS,
   getSimulatorProgram,
 } from '@/lib/data/prompts';
+import { UNIVERSITIES } from '@/lib/data/programs';
 import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
 import { useAuth } from './auth-provider';
@@ -88,6 +88,7 @@ export default function Simulator() {
   const { user, loading: authLoading, openAuth } = useAuth();
 
   const [programCode, setProgramCode] = useState<string>('queens_comm');
+  const [uniKey, setUniKey] = useState<string>('all');
   const [format, setFormat] = useState<Format>('written');
   const [phase, setPhase] = useState<Phase>('idle');
   const [timeLeft, setTimeLeft] = useState(0);
@@ -380,23 +381,41 @@ export default function Simulator() {
         </div>
 
         <div>
+          <label htmlFor="sim-uni" className="label">
+            Target university
+          </label>
+          <select
+            id="sim-uni"
+            value={uniKey}
+            onChange={(e) => setUniKey(e.target.value)}
+            className="input"
+          >
+            <option value="all">All universities</option>
+            {UNIVERSITIES.map((u) => (
+              <option key={u.key} value={u.key}>
+                {u.short}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label htmlFor="sim-program" className="label">
-            Target university &amp; program
+            Target program
           </label>
           <select
             id="sim-program"
             value={programCode}
             onChange={(e) => setProgramCode(e.target.value)}
             className="input"
+            disabled={!getSimulatorProgram(programCode)}
           >
-            {PROGRAM_GROUPS.map((group) => (
-              <optgroup key={group} label={group}>
-                {SIMULATOR_PROGRAMS.filter((p) => p.group === group).map((p) => (
-                  <option key={p.code} value={p.code}>
-                    {p.label}
-                  </option>
-                ))}
-              </optgroup>
+            {(uniKey === 'all'
+              ? UNIVERSITIES.flatMap((u) => u.programs)
+              : (UNIVERSITIES.find((u) => u.key === uniKey)?.programs ?? [])
+            ).map((p) => (
+              <option key={p.code} value={p.code}>
+                {p.name}
+              </option>
             ))}
           </select>
         </div>

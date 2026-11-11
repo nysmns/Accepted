@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Loader2, MessageSquareWarning, Plus, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Check, CloudUpload, Loader2, MessageSquareWarning, Plus, Trash2 } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
 import { EC_KEY, type EcLevel } from '@/lib/position';
+import { categoriesForEc, type EcCategory } from '@/lib/ec-tags';
 import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
+import { useAuth } from './auth-provider';
 
 type Ec = { id: string; name: string; role: string; duration: string; hours: string; detail: string };
 type Result = {
@@ -20,45 +22,109 @@ const MAX_ECS = 8;
 const blank = (): Ec => ({ id: crypto.randomUUID(), name: '', role: '', duration: '', hours: '', detail: '' });
 
 const TIER: Record<EcLevel, string> = {
-  standout: 'bg-moss text-paper',
-  strong: 'bg-sage text-deep',
-  solid: 'bg-sand text-deep',
-  light: 'bg-sand text-muted',
+  standout: 'bg-accent text-on-accent',
+  strong: 'bg-success-tint text-success',
+  solid: 'bg-inset text-secondary',
+  light: 'bg-inset text-muted',
 };
 
-const field =
-  'w-full rounded-lg  bg-sand p-2.5 text-sm text-deep outline-none focus:ring-2 focus:ring-moss';
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export default function EcRater() {
+  const { user, loading: authLoading } = useAuth();
   const [ecs, setEcs] = useState<Ec[]>([blank()]);
   const [target, setTarget] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [ready, setReady] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const dirty = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Load: the account list when signed in, the browser draft otherwise.
   useEffect(() => {
-    try {
-      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null');
-      if (Array.isArray(d?.ecs) && d.ecs.length) setEcs(d.ecs.slice(0, MAX_ECS));
-      if (typeof d?.target === 'string') setTarget(d.target);
-    } catch {
-      // a bad draft just starts fresh
+    if (authLoading) return;
+    let cancelled = false;
+
+    if (user) {
+      authFetch('/api/ecs')
+        .then(async (res) => {
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          if (cancelled) return;
+          const list = Array.isArray(data.ecs) ? data.ecs : [];
+          if (list.length) {
+            setEcs(
+              list.map((e: Omit<Ec, 'hours'> & { hours: number }) => ({ ...e, hours: String(e.hours) }))
+            );
+          }
+          setReady(true);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setError('Could not load your saved activities. You can still edit them here.');
+          setReady(true);
+        });
+    } else {
+      try {
+        const d = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? 'null');
+        if (Array.isArray(d?.ecs) && d.ecs.length) setEcs(d.ecs.slice(0, MAX_ECS));
+        if (typeof d?.target === 'string') setTarget(d.target);
+      } catch {
+        // a bad draft just starts fresh
+      }
+      setReady(true);
     }
-    setReady(true);
-  }, []);
 
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user]);
+
+  // Browser draft for signed-out students.
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || user) return;
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({ ecs, target }));
     } catch {
       // storage unavailable: drafts just won't persist
     }
-  }, [ecs, target, ready]);
+  }, [ecs, target, ready, user]);
 
-  const update = (id: string, patch: Partial<Ec>) =>
+  // Debounced save to the account.
+  useEffect(() => {
+    if (!ready || !user || !dirty.current) return;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(async () => {
+      const list = ecs
+        .filter((e) => e.name.trim())
+        .map((e) => ({ ...e, hours: Number(e.hours) || 0 }));
+      if (!list.length) return;
+      setSaveState('saving');
+      try {
+        const res = await authFetch('/api/ecs', { method: 'PUT', body: JSON.stringify({ ecs: list }) });
+        setSaveState(res.ok ? 'saved' : 'error');
+      } catch {
+        setSaveState('error');
+      }
+    }, 800);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [ecs, ready, user]);
+
+  const update = useCallback((id: string, patch: Partial<Ec>) => {
+    dirty.current = true;
+    setSaveState('idle');
     setEcs((list) => list.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    dirty.current = true;
+    setSaveState('idle');
+    setEcs((list) => (list.length > 1 ? list.filter((e) => e.id !== id) : list));
+  }, []);
 
   async function rate() {
     if (ecs.some((e) => !e.name.trim())) {
@@ -94,143 +160,215 @@ export default function EcRater() {
     }
   }
 
+  const tagsFor = (ec: Ec): EcCategory[] =>
+    categoriesForEc(`${ec.name} ${ec.role} ${ec.detail}`).slice(0, 4);
+
   return (
-    <div className="space-y-8">
-      <header className="max-w-3xl">
-        <h1 className="mt-3 text-3xl font-medium leading-tight text-deep sm:text-4xl">
-          Rank your activities. Make them count.
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-muted sm:text-base">
-          List what you do outside class. Nova ranks it by depth, responsibility and impact, then
-          tells you how to turn each activity into something you can speak to honestly. Your
-          overall level also shows up in the Planner and Programs.
-        </p>
-      </header>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="panel space-y-4 p-5 sm:p-6">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <section className="panel panel-pad space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <label htmlFor="ec-target" className="mb-1 block text-xs font-medium text-muted">
-              Target program (optional)
-            </label>
-            <select id="ec-target" value={target} onChange={(e) => setTarget(e.target.value)} className={field}>
-              <option value="">No specific program</option>
-              {UNIVERSITIES.map((u) => (
-                <optgroup key={u.key} label={u.name}>
-                  {u.programs.map((p) => (
-                    <option key={p.name} value={`${u.name}: ${p.name}`}>
-                      {p.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
-
-          {ecs.map((ec, i) => (
-            <fieldset key={ec.id} className="space-y-3 rounded-xl bg-paper/95 p-4">
-              <div className="flex items-center justify-between">
-                <legend className="text-xs font-semibold text-moss">
-                  Activity {i + 1}
-                </legend>
-                {ecs.length > 1 && (
-                  <button
-                    onClick={() => setEcs((l) => l.filter((e) => e.id !== ec.id))}
-                    aria-label={`Remove activity ${i + 1}`}
-                    className="rounded-lg p-1.5 text-muted transition hover:text-brick"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-              <input aria-label="Activity name" value={ec.name} maxLength={80} placeholder="Activity (e.g. Robotics Club)"
-                onChange={(e) => update(ec.id, { name: e.target.value })} className={field} />
-              <div className="grid gap-3 sm:grid-cols-3">
-                <input aria-label="Your role" value={ec.role} maxLength={80} placeholder="Your role"
-                  onChange={(e) => update(ec.id, { role: e.target.value })} className={field} />
-                <input aria-label="How long" value={ec.duration} maxLength={40} placeholder="How long (2 yrs)"
-                  onChange={(e) => update(ec.id, { duration: e.target.value })} className={field} />
-                <input aria-label="Hours per week" value={ec.hours} inputMode="numeric" placeholder="Hrs / week"
-                  onChange={(e) => update(ec.id, { hours: e.target.value.replace(/\D/g, '').slice(0, 2) })} className={field} />
-              </div>
-              <textarea aria-label="What you did and what changed" value={ec.detail} maxLength={600} rows={3}
-                placeholder="What did you actually do, and what changed because of it? Numbers help."
-                onChange={(e) => update(ec.id, { detail: e.target.value })} className={`${field} resize-y`} />
-            </fieldset>
-          ))}
-
-          {ecs.length < MAX_ECS && (
-            <button
-              onClick={() => setEcs((l) => [...l, blank()])}
-              className="inline-flex items-center gap-2 text-sm font-semibold text-moss hover:underline"
-            >
-              <Plus className="h-4 w-4" /> Add activity
-            </button>
-          )}
-
-          {error && (
-            <div role="alert" className="flex items-center gap-2 border-l-4 border-brick bg-brick px-4 py-3 text-sm text-brick">
-              <MessageSquareWarning className="h-4 w-4 shrink-0" /> {error}
-            </div>
-          )}
-
-          <button
-            onClick={rate}
-            disabled={loading}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-navy px-5 text-sm font-semibold text-paper transition hover:bg-deep disabled:opacity-60"
-          >
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Rating…</> : 'Rank my ECs'}
-          </button>
-        </section>
-
-        <section className="panel min-h-[320px] p-5 sm:p-6" aria-live="polite">
-          {!result ? (
-            <p className="my-16 text-center text-sm text-muted">
-              Your ranking and advice will appear here.
+            <h2 className="text-sm font-semibold text-foreground">Your activities</h2>
+            <p className="mt-1 text-[12px] leading-6 text-muted">
+              {user
+                ? 'Saved to your account. Edit anything and it updates automatically.'
+                : 'Saved in this browser. Sign in to keep them on your account.'}
             </p>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${TIER[result.overallLevel]}`}>
-                  Overall: {result.overallLevel}
-                </span>
-                <p className="mt-3 text-[15px] leading-relaxed text-deep">{result.summary}</p>
-              </div>
+          </div>
+          {user && (
+            <span
+              className="badge"
+              role="status"
+              aria-live="polite"
+              data-state={saveState}
+            >
+              {saveState === 'saving' && <Loader2 size={12} className="animate-spin" />}
+              {saveState === 'saved' && <Check size={12} />}
+              {saveState === 'error' && <MessageSquareWarning size={12} />}
+              {saveState === 'saving'
+                ? 'Saving…'
+                : saveState === 'saved'
+                  ? 'Saved'
+                  : saveState === 'error'
+                    ? 'Could not save'
+                    : 'On your account'}
+            </span>
+          )}
+        </div>
 
-              <ol className="space-y-4">
-                {result.ranked.map((r, i) => (
-                  <li key={`${r.name}-${i}`} className="rounded-xl bg-paper/95 p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="text-base font-medium text-deep">
-                        {i + 1}. {r.name}
-                      </h3>
-                      <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${TIER[r.tier]}`}>
-                        {r.tier}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-muted">{r.why}</p>
-                    <p className="mt-2 text-sm leading-6 text-deep">
-                      <span className="font-semibold text-moss">Make it count: </span>
-                      {r.leverage}
-                    </p>
-                  </li>
+        <div>
+          <label htmlFor="ec-target" className="field-label">
+            Target program (optional)
+          </label>
+          <select
+            id="ec-target"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            className="field"
+          >
+            <option value="">No specific program</option>
+            {UNIVERSITIES.map((u) => (
+              <optgroup key={u.key} label={u.name}>
+                {u.programs.map((p) => (
+                  <option key={p.code} value={`${u.name}: ${p.name}`}>
+                    {p.name}
+                  </option>
                 ))}
-              </ol>
+              </optgroup>
+            ))}
+          </select>
+        </div>
 
-              {result.gaps.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-deep">Gaps to close</h3>
-                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm leading-6 text-muted">
-                    {result.gaps.map((g, i) => (
-                      <li key={i}>{g}</li>
-                    ))}
-                  </ul>
-                </div>
+        {ecs.map((ec, i) => (
+          <fieldset key={ec.id} className="space-y-3 rounded-xl border border-line bg-canvas p-4">
+            <div className="flex items-center justify-between gap-2">
+              <legend className="text-xs font-semibold text-accent">Activity {i + 1}</legend>
+              {ecs.length > 1 && (
+                <button
+                  onClick={() => remove(ec.id)}
+                  aria-label={`Remove activity ${i + 1}`}
+                  className="icon-button -mr-2 -mt-1"
+                >
+                  <Trash2 size={15} />
+                </button>
               )}
             </div>
+            <input
+              aria-label="Activity name"
+              value={ec.name}
+              maxLength={80}
+              placeholder="Activity (e.g. Robotics Club)"
+              onChange={(e) => update(ec.id, { name: e.target.value })}
+              className="field"
+            />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <input
+                aria-label="Your role"
+                value={ec.role}
+                maxLength={80}
+                placeholder="Your role"
+                onChange={(e) => update(ec.id, { role: e.target.value })}
+                className="field"
+              />
+              <input
+                aria-label="How long"
+                value={ec.duration}
+                maxLength={40}
+                placeholder="How long (2 yrs)"
+                onChange={(e) => update(ec.id, { duration: e.target.value })}
+                className="field"
+              />
+              <input
+                aria-label="Hours per week"
+                value={ec.hours}
+                inputMode="numeric"
+                placeholder="Hrs / week"
+                onChange={(e) => update(ec.id, { hours: e.target.value.replace(/\D/g, '').slice(0, 2) })}
+                className="field"
+              />
+            </div>
+            <textarea
+              aria-label="What you did and what changed"
+              value={ec.detail}
+              maxLength={600}
+              rows={3}
+              placeholder="What did you actually do, and what changed because of it? Numbers help."
+              onChange={(e) => update(ec.id, { detail: e.target.value })}
+              className="field resize-y"
+            />
+            {tagsFor(ec).length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {tagsFor(ec).map((tag) => (
+                  <span key={tag} className="badge badge-accent">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </fieldset>
+        ))}
+
+        {ecs.length < MAX_ECS && (
+          <button
+            onClick={() => {
+              dirty.current = true;
+              setEcs((l) => [...l, blank()]);
+            }}
+            className="text-link"
+          >
+            <Plus size={15} /> Add activity
+          </button>
+        )}
+
+        {error && (
+          <div role="alert" className="notice notice-error">
+            <MessageSquareWarning size={16} /> {error}
+          </div>
+        )}
+
+        <button onClick={rate} disabled={loading} className="btn-primary w-full">
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Ranking…
+            </>
+          ) : (
+            <>
+              <CloudUpload size={16} /> Rank my ECs
+            </>
           )}
-        </section>
-      </div>
+        </button>
+      </section>
+
+      <section className="panel panel-pad min-h-[320px]" aria-live="polite">
+        {!result ? (
+          <div className="empty-state my-16">
+            <h2>Your ranking appears here</h2>
+            <p>Nova ranks each activity by depth, responsibility and impact, then tells you how to make it count.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div>
+              <span className={`badge ${TIER[result.overallLevel]} capitalize`}>
+                Overall: {result.overallLevel}
+              </span>
+              <p className="mt-3 text-[15px] leading-relaxed text-secondary">{result.summary}</p>
+            </div>
+
+            <ol className="space-y-4">
+              {result.ranked.map((r, i) => (
+                <li key={`${r.name}-${i}`} className="rounded-xl border border-line bg-canvas p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-medium text-foreground">
+                      {i + 1}. {r.name}
+                    </h3>
+                    <span
+                      className={`badge shrink-0 capitalize ${TIER[r.tier]}`}
+                    >
+                      {r.tier}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-muted">{r.why}</p>
+                  <p className="mt-2 text-sm leading-6 text-secondary">
+                    <span className="font-semibold text-accent">Make it count: </span>
+                    {r.leverage}
+                  </p>
+                </li>
+              ))}
+            </ol>
+
+            {result.gaps.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">Gaps to close</h3>
+                <ul className="feedback-list mt-2">
+                  {result.gaps.map((g, i) => (
+                    <li key={i}>{g}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

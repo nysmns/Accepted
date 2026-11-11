@@ -1,51 +1,84 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Check, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Check, Lock } from 'lucide-react';
 import { useAuth } from './auth-provider';
 import { trackEvent } from '@/lib/track';
 import PageSkeleton from './page-skeleton';
 
-/** AI tools render only for signed-in users. The API routes enforce this again server-side. */
-export default function RequireAuth({ children, what }: { children: ReactNode; what: string }) {
+type GateProps = {
+  children: ReactNode;
+  /** What the student gets access to, e.g. "the practice simulator". */
+  what: string;
+  eyebrow?: string;
+  headline?: string;
+  body?: string;
+  perks?: string[];
+};
+
+const DEFAULT_PERKS = [
+  'Realistic preparation and response timers',
+  'Specific feedback, strengths and next steps',
+  'Your scores and progress, saved to your account',
+];
+
+/**
+ * Pages that need an account render this instead of their content.
+ * The API routes enforce the same rule server-side.
+ */
+export default function RequireAuth({
+  children,
+  what,
+  eyebrow = 'Your practice, kept personal',
+  headline = 'Make room for your next chapter.',
+  body,
+  perks = DEFAULT_PERKS,
+}: GateProps) {
   const { user, loading, openAuth } = useAuth();
 
   if (loading) return <PageSkeleton />;
   if (user) return <>{children}</>;
 
-  const perks = [
-    'Timed practice under the real supplemental limits',
-    'A score, a verdict, and a model rewrite from Nova',
-    'Results saved to your account and your daily limit shared fairly',
-  ];
-
   return (
-    <div className="mx-auto my-14 flex max-w-lg flex-col items-center rounded-xl bg-surface p-8 text-center shadow-sm">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-sage/45 text-moss">
-        <Lock className="h-5 w-5" />
-      </span>
-      <h1 className="mt-5 text-2xl font-medium text-deep">Sign up to use {what}</h1>
-      <p className="mt-3 text-sm leading-6 text-muted">
-        Feedback from Nova is free, but you need an account so your scores are saved and the free
-        daily limit is shared fairly.
-      </p>
-      <ul className="mt-5 space-y-2 text-left">
-        {perks.map((perk) => (
-          <li key={perk} className="flex items-start gap-2 text-sm leading-6 text-deep/90">
-            <Check className="mt-1 h-4 w-4 shrink-0 text-moss" />
-            {perk}
-          </li>
-        ))}
-      </ul>
-      <button
-        onClick={() => {
-          trackEvent('gate_cta_clicked', { what });
-          openAuth();
-        }}
-        className="btn-primary mt-6 w-full"
-      >
-        Sign up or sign in
-      </button>
+    <div className="gate">
+      <div className="gate-main">
+        <span className="gate-symbol">
+          <Lock size={26} strokeWidth={1.8} />
+        </span>
+        <p className="eyebrow">{eyebrow}</p>
+        <h1 className="gate-headline">{headline}</h1>
+        <p className="gate-body">
+          {body ?? `Sign in to use ${what}. Keep your feedback together and build on every practice session.`}
+        </p>
+        <button
+          onClick={() => {
+            trackEvent('gate_cta_clicked', { what });
+            openAuth();
+          }}
+          className="btn-primary mt-6"
+        >
+          Sign up or sign in <ArrowRight size={15} />
+        </button>
+        <p className="gate-note">Nova feedback is free. An account keeps daily limits fair.</p>
+      </div>
+
+      <aside className="gate-aside">
+        <p className="eyebrow">A workspace that grows with you</p>
+        <ul className="gate-list">
+          {perks.map((perk) => (
+            <li key={perk}>
+              <Check size={16} strokeWidth={2.4} />
+              {perk}
+            </li>
+          ))}
+        </ul>
+        <div className="gate-link">
+          <Link href="/vault" className="text-link">
+            Explore programs first <ArrowRight size={15} />
+          </Link>
+        </div>
+      </aside>
     </div>
   );
 }

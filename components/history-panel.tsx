@@ -67,15 +67,15 @@ export default function HistoryPanel() {
 
   const sortHeader = (key: SortKey, label: string, className = '') => (
     <th
-      onClick={() => toggleSort(key)}
+      className={className}
       aria-sort={sort.key === key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined}
-      title={`Sort by ${label.toLowerCase()}`}
-      className={`cursor-pointer select-none whitespace-nowrap px-4 py-3 font-semibold transition hover:text-deep ${className}`}
     >
-      {label}
-      <span className="ml-1 inline-block w-3 text-moss">
-        {sort.key === key ? (sort.dir === 'asc' ? '↑' : '↓') : ''}
-      </span>
+      <button className="table-sort" onClick={() => toggleSort(key)} title={`Sort by ${label.toLowerCase()}`}>
+        {label}
+        <span className="text-accent">
+          {sort.key === key ? (sort.dir === 'asc' ? '↑' : '↓') : ''}
+        </span>
+      </button>
     </th>
   );
 
@@ -100,17 +100,18 @@ export default function HistoryPanel() {
 
   if (error) {
     return (
-      <div className="panel p-10 text-center text-sm text-brick" role="alert">
-        {error}
+      <div className="panel empty-state" role="alert">
+        <h2>Could not load historical averages</h2>
+        <p>{error}</p>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="panel flex items-center justify-center gap-3 p-16 text-sm text-muted" role="status">
-        <Loader2 className="h-5 w-5 animate-spin text-moss" />
-        Loading historical averages…
+      <div className="loading-state" role="status">
+        <Loader2 className="h-5 w-5 animate-spin text-accent" />
+        <p>Loading historical averages…</p>
       </div>
     );
   }
@@ -124,21 +125,21 @@ export default function HistoryPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-px bg-sand lg:grid-cols-4">
+      <div className="stat-band">
         {stats.map((s) => (
-          <div key={s.label} className="bg-surface p-5">
-            <p className="eyebrow">{s.label}</p>
-            <p className="mt-2 font-display text-2xl font-semibold text-deep">{s.value}</p>
+          <div key={s.label} className="stat-cell">
+            <p>{s.label}</p>
+            <strong>{s.value}</strong>
           </div>
         ))}
       </div>
 
-      <div className="panel p-5 sm:p-6">
+      <div className="panel panel-pad">
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+          <div className="search-field flex-1">
+            <Search size={16} />
             <input
-              type="text"
+              type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onBlur={(e) =>
@@ -149,7 +150,7 @@ export default function HistoryPanel() {
               }
               aria-label="Search programs and universities"
               placeholder="Search a program or university…"
-              className="input pl-9"
+              className="field"
             />
           </div>
           <select
@@ -159,7 +160,7 @@ export default function HistoryPanel() {
               trackEvent('history_filter_changed', { university: e.target.value });
             }}
             aria-label="Filter by university"
-            className="input md:w-56"
+            className="field md:w-56"
           >
             <option value="all">All universities</option>
             {universities.map((u) => (
@@ -175,34 +176,32 @@ export default function HistoryPanel() {
           average of admitted applicants, from self-reported outcomes. They are a planning reference,
           not an admission guarantee.
         </p>
+      </div>
 
-        <div className="mt-4 rounded-lg">
-          <table className="w-full text-sm">
-            <thead className="sticky top-16 z-10 bg-sand">
-              <tr className="text-left text-xs text-muted">
+      <div className="panel overflow-hidden">
+        <div className="table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
                 {sortHeader('university', 'University', 'hidden sm:table-cell')}
                 {sortHeader('program', 'Program')}
                 {sortHeader('offers', 'Offers', 'text-right')}
                 {sortHeader('average', 'Average', 'text-right')}
-                <th className="hidden whitespace-nowrap px-4 py-3 text-right font-semibold md:table-cell">
-                  Range
-                </th>
-                <th className="hidden whitespace-nowrap px-4 py-3 text-center font-semibold lg:table-cell">
-                  Recent years
-                </th>
+                <th className="hidden text-right md:table-cell">Range</th>
+                <th className="hidden text-center lg:table-cell">Recent years</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-navy/10">
+            <tbody>
               {rows.map((p) => (
-                <tr key={`${p.university}-${p.program}`} className="transition hover:bg-sand/50">
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-xs text-muted sm:table-cell">{p.university}</td>
-                  <td className="px-4 py-3 font-medium text-deep">{p.program}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-xs text-muted">{p.offers}</td>
+                <tr key={`${p.university}-${p.program}`}>
+                  <td className="hidden whitespace-nowrap text-muted sm:table-cell">{p.university}</td>
+                  <td className="font-medium text-foreground">{p.program}</td>
+                  <td className="text-right tabular-nums text-muted">{p.offers}</td>
                   <td
-                    className={`px-4 py-3 text-right tabular-nums text-base font-semibold ${
+                    className={`text-right tabular-nums font-semibold ${
                       p.offers < 5
-                        ? 'text-muted underline decoration-dotted decoration-muted/60 underline-offset-4'
-                        : 'text-moss'
+                        ? 'text-muted underline decoration-dotted underline-offset-4'
+                        : 'text-success'
                     }`}
                     title={
                       p.offers < 5
@@ -212,10 +211,10 @@ export default function HistoryPanel() {
                   >
                     {p.average.toFixed(1)}%
                   </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-right tabular-nums text-xs text-muted md:table-cell">
+                  <td className="hidden whitespace-nowrap text-right tabular-nums text-muted md:table-cell">
                     {p.low.toFixed(1)}%–{p.high.toFixed(1)}%
                   </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 text-center tabular-nums text-xs text-muted lg:table-cell">
+                  <td className="hidden whitespace-nowrap text-center tabular-nums text-muted lg:table-cell">
                     {p.byYear
                       .slice(-3)
                       .map((y) => `${y.year} ${y.average.toFixed(1)}`)
@@ -225,7 +224,7 @@ export default function HistoryPanel() {
               ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted">
+                  <td colSpan={6} className="text-center text-muted">
                     No programs match “{query}”.
                   </td>
                 </tr>

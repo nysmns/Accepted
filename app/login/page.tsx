@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto max-w-md px-4 py-16">
-      <div className="panel p-6">
+    <div className="workspace-page">
+      <div className="panel mx-auto max-w-md p-6 sm:p-8">
         <LoginCard />
       </div>
     </div>

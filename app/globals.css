@@ -180,6 +180,27 @@ textarea.field,textarea.input{resize:vertical;line-height:1.9}
 .step-track b{border:1px solid var(--color-line);border-radius:50%;place-items:center;width:21px;height:21px;font-size:10px;font-weight:500;display:grid}
 .step-track .current{color:var(--color-accent)}
 .step-track .current b{color:#fff;background:var(--color-accent);border-color:var(--color-accent)}
+.badge-neutral{background:var(--color-inset);color:var(--color-secondary)}
+
+/* Stat strip: bordered, rounded, clipped dividers — the analytics summary band. */
+.stat-band{border:1px solid var(--color-line);background:var(--color-paper);border-radius:14px;grid-template-columns:repeat(4,minmax(0,1fr));overflow:hidden;box-shadow:var(--paper-shadow);display:grid}
+.stat-cell{min-width:0;padding:22px 24px}
+.stat-cell+.stat-cell{border-left:1px solid var(--color-line)}
+.stat-cell>p{color:var(--color-muted);font-size:11px;font-weight:550;line-height:1.5}
+.stat-cell>strong{font-family:var(--font-display);letter-spacing:-.05em;font-variant-numeric:tabular-nums;margin-top:6px;font-size:27px;font-weight:550;line-height:1.25;display:block}
+
+/* Sign-in gate: two-column card shown on pages that need an account. */
+.gate{border:1px solid var(--color-line);background:var(--color-paper);border-radius:18px;max-width:920px;margin:0 auto;overflow:hidden;box-shadow:var(--paper-shadow);grid-template-columns:1.06fr .94fr;display:grid}
+.gate-main{min-width:0;padding:40px}
+.gate-aside{background:var(--color-inset);border-left:1px solid var(--color-line);padding:40px;display:flex;flex-direction:column;justify-content:center}
+.gate-symbol{border:1px solid var(--color-line);background:var(--color-accent-tint);width:64px;height:64px;color:var(--color-accent);border-radius:16px;display:grid;place-items:center;margin-bottom:24px}
+.gate-headline{font-family:var(--font-display);letter-spacing:-.03em;margin-top:14px;font-size:clamp(26px,2.6vw,32px);font-weight:600;line-height:1.2}
+.gate-body{color:var(--color-secondary);margin-top:14px;font-size:15px;line-height:1.75}
+.gate-note{color:var(--color-muted);margin-top:12px;font-size:12px;line-height:1.7}
+.gate-list{margin:22px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+.gate-list li{align-items:flex-start;gap:10px;font-size:14px;line-height:1.65;display:flex}
+.gate-list svg{color:var(--color-success);margin-top:2px;flex-shrink:0}
+.gate-link{margin-top:26px}
 
 /* Kept from the previous theme for pages not yet ported. */
 .chip{@apply inline-flex items-center gap-1.5 rounded-md bg-sage/40 px-2.5 py-1 text-sm font-medium text-deep}
@@ -326,6 +347,13 @@ textarea.field,textarea.input{resize:vertical;line-height:1.9}
 .journey-row{grid-template-columns:48px .8fr 1fr auto;gap:18px}
 }
 @media (max-width:767px){.workspace-page{padding:26px 20px 36px}
+.stat-band{grid-template-columns:1fr 1fr}
+.stat-cell:nth-child(3){border-left:0;border-top:1px solid var(--color-line)}
+.stat-cell:nth-child(4){border-top:1px solid var(--color-line)}
+.stat-cell>strong{font-size:24px}
+.gate{grid-template-columns:minmax(0,1fr)}
+.gate-aside{border-left:0;border-top:1px solid var(--color-line)}
+.gate-main,.gate-aside{padding:28px 24px}
 .page-heading{flex-direction:column;align-items:stretch;gap:16px;margin-bottom:24px}
 .page-heading h1{font-size:29px}
 .page-description{font-size:13px}

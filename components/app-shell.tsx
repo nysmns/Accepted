@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   ArrowRight,
   ArrowUpRight,
+  Award,
   BookOpen,
   ChartNoAxesCombined,
   Check,
@@ -26,6 +27,7 @@ import { SITE } from '@/lib/site';
 const LINKS = [
   { href: '/planner', label: 'Application planner', short: 'My plan', icon: LayoutList, group: 'Plan' },
   { href: '/vault', label: 'Program vault', short: 'Programs', icon: BookOpen, group: 'Plan' },
+  { href: '/scholarships', label: 'Scholarship finder', short: 'Awards', icon: Award, group: 'Plan' },
   { href: '/simulator', label: 'Practice studio', short: 'Practice', icon: PenLine, group: 'Prepare' },
   { href: '/interview', label: 'Mock interview', short: 'Interview', icon: Mic, group: 'Prepare' },
   { href: '/ec-rater', label: 'Activity portfolio', short: 'Activities', icon: Sprout, group: 'Prepare' },
@@ -114,6 +116,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <Brand />
             <nav aria-label="Main navigation" className="top-links">
               <Link href="/vault">Explore programs</Link>
+              <Link href="/scholarships">Scholarships</Link>
               <Link href="/planner">Plan your applications</Link>
               <Link href="/simulator">Meet your practice studio</Link>
             </nav>

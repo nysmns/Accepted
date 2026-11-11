@@ -9,8 +9,23 @@ export const metadata = {
 
 export default function AnalyticsPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-      <RequireAuth what="your progress">
+    <div className="workspace-page">
+      <header className="page-heading">
+        <div>
+          <p className="eyebrow">Reflect / Nova analytics</p>
+          <h1>Your progress</h1>
+          <p className="page-description">
+            Scores by program, your weekly trend, and an AI breakdown of where to focus next —
+            saved to your account.
+          </p>
+        </div>
+      </header>
+
+      <RequireAuth
+        what="Nova analytics"
+        eyebrow="Your record, kept personal"
+        body="Sign in to see your scores, progress and Nova's breakdowns. They are saved to your account."
+      >
         <AnalyticsDashboard />
       </RequireAuth>
     </div>
