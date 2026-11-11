@@ -2,184 +2,236 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
-import { readPlannerAverage } from '@/lib/position';
-import { ProgramTags, RangeBar } from './program-signals';
-import { ArrowRight, Search } from 'lucide-react';
-import { trackEvent } from '@/lib/track';
+import { readEcLevel, readPlannerAverage, suppSignals, type EcLevel } from '@/lib/position';
+import { EcFit, ProgramTags, RangeBar } from './program-signals';
+import TrackedLink from './tracked-link';
+
+type Requirement = 'all' | 'written' | 'profile' | 'interview';
+
+const REQUIREMENTS: { value: Requirement; label: string }[] = [
+  { value: 'all', label: 'All requirements' },
+  { value: 'written', label: 'Long answer / written' },
+  { value: 'profile', label: 'Background & ECs' },
+  { value: 'interview', label: 'Interview / video' },
+];
+
+const matchesRequirement: Record<Requirement, (req: string) => boolean> = {
+  all: () => true,
+  written: (req) => suppSignals(req).longAnswer,
+  profile: (req) => suppSignals(req).background,
+  interview: (req) => /interview|video/i.test(req),
+};
 
 export default function Vault() {
-  const [uniKey, setUniKey] = useState<string>('waterloo');
   const [query, setQuery] = useState('');
+  const [requirement, setRequirement] = useState<Requirement>('all');
+  const [uniKey, setUniKey] = useState('all');
   const [average, setAverage] = useState<number | null>(null);
+  const [ecLevel, setEcLevel] = useState<EcLevel | null>(null);
 
-  useEffect(() => setAverage(readPlannerAverage()), []);
-
-  const university = UNIVERSITIES.find((u) => u.key === uniKey) ?? UNIVERSITIES[0];
+  useEffect(() => {
+    setAverage(readPlannerAverage());
+    setEcLevel(readEcLevel());
+  }, []);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return university.programs;
-    return university.programs.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.req.toLowerCase().includes(q) ||
-        p.deadline.toLowerCase().includes(q)
-    );
-  }, [university, query]);
+    return UNIVERSITIES.filter((u) => uniKey === 'all' || u.key === uniKey)
+      .flatMap((u) => u.programs.map((p) => ({ ...p, university: u.name })))
+      .filter(
+        (p) =>
+          matchesRequirement[requirement](p.req) &&
+          (!q || `${p.name} ${p.university} ${p.req} ${p.deadline}`.toLowerCase().includes(q))
+      );
+  }, [query, requirement, uniKey]);
+
+  const practice = (p: (typeof rows)[number]) => ({
+    href: `/simulator?program=${p.code}`,
+    event: 'practice_clicked',
+    properties: { code: p.code, program: p.name },
+    'aria-label': `Practise ${p.name}`,
+    className: 'text-link text-xs!',
+  });
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="workspace-page">
+      <header className="page-heading">
         <div>
-          <h1 className="mt-2 font-display text-2xl font-semibold text-deep md:text-3xl">
-            Ontario Supplemental Program Guide
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted">
-            Select a university below to browse all programs requiring supplemental
-            applications, competitive averages, and deadlines. These are planning
-            references, not official admission guarantees; verify each detail with the university.
+          <p className="eyebrow">Plan / Program vault</p>
+          <h1>Find a program. See the possibilities.</h1>
+          <p className="page-description">
+            Compare supplemental requirements by university and program. Find out which applications need writing, an
+            interview, or an activity profile.
           </p>
         </div>
-        <div className="w-full md:w-72">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+        <div className="page-actions">
+          <span className="badge badge-neutral">
+            <BookOpen size={13} />
+            {UNIVERSITIES.length} universities
+          </span>
+        </div>
+      </header>
+
+      <div className="panel panel-pad">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="search-field flex-1">
+            <Search size={16} />
             <input
-              type="text"
+              type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search programs and requirements"
-              placeholder="Search program name..."
-              className="w-full rounded-lg bg-sand py-2.5 pl-9 pr-3 text-sm text-deep outline-none focus:ring-2 focus:ring-moss"
+              placeholder="Program, university, or requirement…"
+              className="field"
             />
           </div>
-        </div>
-      </div>
-
-      <p className="mt-4 text-xs text-muted">
-        {average == null ? (
-          <>
-            <Link href="/planner" className="font-semibold text-moss hover:underline">
-              Set your average in the Planner
-            </Link>{' '}
-            to see where you sit on each range.
-          </>
-        ) : (
-          <>Your saved average is {average}%. The marker on each bar shows where you sit.</>
-        )}
-      </p>
-
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-        {UNIVERSITIES.map((u) => (
-          <button
-            key={u.key}
-            onClick={() => setUniKey(u.key)}
-            aria-pressed={uniKey === u.key}
-            className={`rounded-xl px-3 py-3 text-xs font-medium transition ${
-              uniKey === u.key
-                ? 'bg-navy text-paper shadow'
-                : ' bg-surface text-muted hover:text-deep'
-            }`}
-          >
-            {u.short}
-          </button>
-        ))}
-      </div>
-
-      <div className="panel mt-4 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-paper/95 p-4 sm:p-5">
-          <h2 className="text-lg font-bold text-deep">
-            {university.name} — Programs with Supplemental Requirements
-          </h2>
-          <span className="rounded-full bg-sage/40 px-3 py-1 text-sm font-medium text-deep">
-            {rows.length} Program{rows.length === 1 ? '' : 's'} Listed
-          </span>
+          <div className="relative sm:w-56">
+            <label className="sr-only" htmlFor="vault-requirement">
+              Filter by requirement
+            </label>
+            <select
+              id="vault-requirement"
+              className="field"
+              value={requirement}
+              onChange={(e) => setRequirement(e.target.value as Requirement)}
+            >
+              {REQUIREMENTS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="space-y-3 p-3 md:hidden">
-          {rows.map((program) => (
-            <article key={program.name} className="rounded-xl bg-paper/95 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-base font-semibold text-deep">{program.name}</h3>
-                <span className="shrink-0 rounded-md bg-sage/40 px-2 py-1 text-sm font-semibold text-deep">
-                  {program.avg}
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-5 text-muted">{program.req}</p>
-              <div className="mt-3 space-y-3">
-                <RangeBar label={program.avg} average={average} />
-                <ProgramTags req={program.req} />
-              </div>
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xs font-medium text-brick">Deadline: {program.deadline}</span>
-                <Link
-                  href={`/simulator?program=${program.code}`}
-                  onClick={() =>
-                    trackEvent('practice_clicked', { code: program.code, program: program.name })
-                  }
-                  className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-surface px-3 text-xs font-semibold text-moss transition hover:"
-                >
-                  Practice prompt <ArrowRight className="h-3 w-3" />
-                </Link>
-              </div>
-            </article>
+        <div className="university-filter" role="group" aria-label="Choose a university">
+          {[{ key: 'all', short: 'All universities' }, ...UNIVERSITIES].map((u) => (
+            <button key={u.key} onClick={() => setUniKey(u.key)} aria-pressed={uniKey === u.key}>
+              {u.short}
+            </button>
           ))}
-          {rows.length === 0 && (
-            <p className="p-8 text-center text-sm text-muted">No programs match “{query}”.</p>
-          )}
         </div>
 
-        <div className="hidden overflow-x-auto md:block">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="text-xs text-muted">
-                <th className="whitespace-nowrap p-4 font-semibold">Program Name</th>
-                <th className="whitespace-nowrap p-4 font-semibold">Est. Competitive Average</th>
-                <th className="p-4 font-semibold">Supp App Requirements &amp; Format</th>
-                <th className="whitespace-nowrap p-4 font-semibold">Deadline</th>
-                <th className="whitespace-nowrap p-4 text-right font-semibold">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy/10">
-              {rows.map((p) => (
-                <tr key={p.name} className="text-deep/90 transition hover:bg-sand/60">
-                  <td className="p-4 font-medium text-deep">{p.name}</td>
-                  <td className="p-4">
-                    <span className="rounded-md bg-sage/40 px-2.5 py-1 font-semibold text-deep">
-                      {p.avg}
-                    </span>
-                    <div className="mt-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+          <p className="fine-print" aria-live="polite">
+            <strong className="font-semibold text-foreground">
+              {rows.length} program{rows.length === 1 ? '' : 's'}
+            </strong>{' '}
+            match your selection
+          </p>
+          <p className="fine-print">
+            {average == null ? (
+              <>
+                <Link href="/planner" className="text-accent underline underline-offset-4">
+                  Set your average in the Planner
+                </Link>{' '}
+                to see where you sit on each range.
+              </>
+            ) : (
+              <>
+                Your saved average <strong className="font-mono font-medium text-accent">{average}%</strong> is marked on
+                each range.
+              </>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className="panel mt-6 overflow-hidden">
+        {rows.length === 0 ? (
+          <div className="empty-state">
+            <h2>No programs match</h2>
+            <p>Try a different search, university, or requirement.</p>
+          </div>
+        ) : (
+          <>
+            <div className="table-wrap hidden xl:block">
+              <table className="data-table">
+                <caption className="sr-only">
+                  Ontario supplemental program requirements and competitive reference ranges
+                </caption>
+                <thead>
+                  <tr>
+                    <th className="w-[24%]">University &amp; program</th>
+                    <th className="w-[20%]">Competitive reference</th>
+                    <th className="w-[30%]">Supplemental requirements</th>
+                    <th>Deadline</th>
+                    <th>
+                      <span className="sr-only">Practice</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((p) => (
+                    <tr key={p.code}>
+                      <td>
+                        <p className="mb-2 text-[10px] text-muted">{p.university}</p>
+                        <h2 className="text-[13px] font-semibold leading-6 tracking-normal">{p.name}</h2>
+                      </td>
+                      <td>
+                        <span className="text-sm font-semibold">{p.avg}</span>
+                        <div className="mt-4">
+                          <RangeBar label={p.avg} average={average} />
+                        </div>
+                      </td>
+                      <td>
+                        <p className="mb-3 text-[11px] leading-6 text-secondary">{p.req}</p>
+                        <ProgramTags req={p.req} />
+                        <div className="mt-3">
+                          <EcFit req={p.req} level={ecLevel} />
+                        </div>
+                      </td>
+                      <td className="text-xs text-secondary">{p.deadline}</td>
+                      <td>
+                        <TrackedLink {...practice(p)}>
+                          Practise <ArrowRight size={14} />
+                        </TrackedLink>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="grid md:grid-cols-2 xl:hidden">
+              {rows.map((p, i) => (
+                <article key={p.code} className="border-b border-line p-5 md:odd:border-r">
+                  <div className="flex items-start gap-3">
+                    <span className="folio-number">{String(i + 1).padStart(2, '0')}</span>
+                    <div>
+                      <p className="text-[10px] text-muted">{p.university}</p>
+                      <h2 className="mt-1 text-base font-semibold leading-6 tracking-tight">{p.name}</h2>
+                    </div>
+                  </div>
+                  <div className="mt-5 flex items-center justify-between gap-4">
+                    <span className="text-sm font-semibold">{p.avg}</span>
+                    <div className="w-40">
                       <RangeBar label={p.avg} average={average} />
                     </div>
-                  </td>
-                  <td className="max-w-md space-y-2 p-4 text-xs text-muted">
-                    <p>{p.req}</p>
+                  </div>
+                  <p className="body-copy mt-4 text-xs!">{p.req}</p>
+                  <div className="mt-3">
                     <ProgramTags req={p.req} />
-                  </td>
-                  <td className="whitespace-nowrap p-4 tabular-nums text-xs text-brick">
-                    {p.deadline}
-                  </td>
-                  <td className="p-4 text-right">
-                    <Link
-                      href={`/simulator?program=${p.code}`}
-                      onClick={() => trackEvent('practice_clicked', { code: p.code, program: p.name })}
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-sand px-3 py-1.5 text-xs font-medium text-moss transition hover:"
-                    >
-                      Practice Prompt <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </td>
-                </tr>
+                  </div>
+                  <div className="mt-3">
+                    <EcFit req={p.req} level={ecLevel} />
+                  </div>
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
+                    <div>
+                      <p className="text-[10px] text-muted">Deadline reference</p>
+                      <p className="mt-1 text-xs">{p.deadline}</p>
+                    </div>
+                    <TrackedLink {...practice(p)}>
+                      Practise <ArrowRight size={14} />
+                    </TrackedLink>
+                  </div>
+                </article>
               ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-sm text-muted">
-                    No programs match “{query}”.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
