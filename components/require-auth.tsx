@@ -4,12 +4,13 @@ import type { ReactNode } from 'react';
 import { Check, Lock } from 'lucide-react';
 import { useAuth } from './auth-provider';
 import { trackEvent } from '@/lib/track';
+import PageSkeleton from './page-skeleton';
 
 /** AI tools render only for signed-in users. The API routes enforce this again server-side. */
 export default function RequireAuth({ children, what }: { children: ReactNode; what: string }) {
   const { user, loading, openAuth } = useAuth();
 
-  if (loading) return <p className="py-16 text-center text-sm text-muted">Loading…</p>;
+  if (loading) return <PageSkeleton />;
   if (user) return <>{children}</>;
 
   const perks = [

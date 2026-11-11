@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
-import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
 import AppShell from '@/components/app-shell';
 import Analytics from '@/components/analytics';
 
-const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' });
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const jbmono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jbmono', display: 'swap' });
+// Self-hosted variable fonts (Fraunces opsz+wght, Inter, JetBrains Mono), as in the reference build.
+const fraunces = localFont({ src: './fonts/fraunces.woff2', variable: '--font-fraunces', weight: '100 900', display: 'swap' });
+const inter = localFont({ src: './fonts/inter.woff2', variable: '--font-inter', weight: '100 900', display: 'swap' });
+const jbmono = localFont({ src: './fonts/jbmono.woff2', variable: '--font-jbmono', weight: '100 800', display: 'swap' });
 
 export const metadata: Metadata = {
   title: {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
@@ -30,10 +30,12 @@ export default function Vault() {
   const [uniKey, setUniKey] = useState('all');
   const [average, setAverage] = useState<number | null>(null);
   const [ecLevel, setEcLevel] = useState<EcLevel | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setAverage(readPlannerAverage());
     setEcLevel(readEcLevel());
+    setReady(true);
   }, []);
 
   const rows = useMemo(() => {
@@ -122,7 +124,9 @@ export default function Vault() {
             match your selection
           </p>
           <p className="fine-print">
-            {average == null ? (
+            {!ready ? (
+              <span className="skeleton h-4 w-64" role="status" aria-label="Loading your saved average" />
+            ) : average == null ? (
               <>
                 <Link href="/planner" className="text-accent underline underline-offset-4">
                   Set your average in the Planner
@@ -164,8 +168,8 @@ export default function Vault() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((p) => (
-                    <tr key={p.code}>
+                  {rows.map((p, i) => (
+                    <tr key={p.code} className="reveal-row" style={{ '--i': i } as CSSProperties}>
                       <td>
                         <p className="mb-2 text-[10px] text-muted">{p.university}</p>
                         <h2 className="text-[13px] font-semibold leading-6 tracking-normal">{p.name}</h2>
@@ -197,7 +201,11 @@ export default function Vault() {
 
             <div className="grid md:grid-cols-2 xl:hidden">
               {rows.map((p, i) => (
-                <article key={p.code} className="border-b border-line p-5 md:odd:border-r">
+                <article
+                  key={p.code}
+                  className="reveal-row border-b border-line p-5 md:odd:border-r"
+                  style={{ '--i': i } as CSSProperties}
+                >
                   <div className="flex items-start gap-3">
                     <span className="folio-number">{String(i + 1).padStart(2, '0')}</span>
                     <div>

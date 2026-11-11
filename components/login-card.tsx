@@ -8,7 +8,7 @@ export default function LoginCard() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <p className="text-sm text-muted">Loading…</p>;
+    return <div className="skeleton h-40 w-full" role="status" aria-label="Loading" />;
   }
 
   if (user) {

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import PageSkeleton from '@/components/page-skeleton';
 import RequireAuth from '@/components/require-auth';
 import Simulator from '@/components/simulator';
 
@@ -23,7 +24,7 @@ export default function SimulatorPage() {
       </header>
 
       <RequireAuth what="the practice simulator">
-        <Suspense fallback={<p className="text-sm text-muted">Loading the simulator…</p>}>
+        <Suspense fallback={<PageSkeleton label="Loading the simulator" />}>
           <Simulator />
         </Suspense>
       </RequireAuth>

@@ -7,6 +7,7 @@ import type { Attempt } from '@/lib/storage';
 import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
 import { useAuth } from './auth-provider';
+import PageSkeleton from './page-skeleton';
 import { ArrowRight, Loader2, Sparkles, Trash2 } from 'lucide-react';
 
 type Summary = {
@@ -124,7 +125,7 @@ export default function AnalyticsDashboard() {
   }
 
   if (authLoading) {
-    return <p className="text-sm text-muted">Loading…</p>;
+    return <PageSkeleton />;
   }
 
   if (!user) {
@@ -147,7 +148,7 @@ export default function AnalyticsDashboard() {
   }
 
   if (attempts === null) {
-    return <p className="text-sm text-muted">Loading your progress…</p>;
+    return <PageSkeleton label="Loading your progress" />;
   }
 
   if (!stats || stats.total === 0) {

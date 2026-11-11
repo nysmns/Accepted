@@ -71,9 +71,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }
 
   const account = loading ? (
-    <span className="fine-print" role="status">
-      Loading account…
-    </span>
+    <span className="skeleton h-11 w-28" role="status" aria-label="Loading account" />
   ) : user ? (
     <button className="btn-quiet" onClick={handleSignOut} disabled={signingOut} aria-label="Sign out">
       <LogOut size={15} />
@@ -146,7 +144,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <div className="account-button">
                   <span className="account-avatar">{user.email?.slice(0, 1).toUpperCase() ?? 'A'}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium">{user.email}</p>
+                    <p className="truncate text-xs font-medium" title={user.email ?? undefined}>
+                      {user.email}
+                    </p>
                     <p className="text-[10px] text-muted">Your workspace</p>
                   </div>
                 </div>
