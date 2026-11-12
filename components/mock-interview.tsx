@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from './auth-provider';
 import { ArrowRight, Check, Mic, MicOff, RotateCcw } from 'lucide-react';
 import { SIMULATOR_PROGRAMS } from '@/lib/data/prompts';
 import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
-import { useAuth } from '@/components/auth-provider';
+import { CustomSelect, type Option } from './custom-select';
 
 type Phase = 'ready' | 'loading' | 'answering' | 'analyzing' | 'results';
 
@@ -326,18 +327,17 @@ export default function MockInterview() {
             <label htmlFor="interview-program" className="label mt-6">
               Choose a program area
             </label>
-            <select
-              id="interview-program"
+            <CustomSelect
               value={programCode}
-              onChange={(event) => setProgramCode(event.target.value)}
-              className="field"
-            >
-              {SIMULATOR_PROGRAMS.map((program) => (
-                <option key={program.code} value={program.code}>
-                  {program.label}
-                </option>
-              ))}
-            </select>
+              onChange={setProgramCode}
+              options={
+                SIMULATOR_PROGRAMS.map((program) => ({
+                  value: program.code,
+                  label: program.label,
+                })) as Option[]
+              }
+              placeholder="Select a program area…"
+            />
             <button onClick={beginInterview} disabled={authLoading} className="btn-primary mt-5 w-full">
               {authLoading ? 'Checking your account…' : 'Start mock interview'}
               {!authLoading && <ArrowRight className="h-4 w-4" />}

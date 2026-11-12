@@ -9,6 +9,7 @@ import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
 import { useAuth } from './auth-provider';
 import PageSkeleton from './page-skeleton';
+import { CustomSelect, type Option } from './custom-select';
 
 type Response = {
   scholarships: ScoredScholarship[];
@@ -235,21 +236,15 @@ export default function Scholarships() {
               className="field"
             />
           </div>
-          <label className="sr-only" htmlFor="scholarship-field">
-            Filter by field of study
-          </label>
-          <select
-            id="scholarship-field"
+          <CustomSelect
             value={field}
-            onChange={(e) => setField(e.target.value)}
-            className="field sm:w-48"
-          >
-            {FIELD_FILTERS.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
+            onChange={setField}
+            options={
+              FIELD_FILTERS.map((f) => ({ value: f, label: f })) as Option[]
+            }
+            placeholder="Filter by field…"
+            listClassName="max-h-48"
+          />
         </div>
 
         {data?.profile && (

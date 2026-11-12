@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { CustomSelect, type Option } from './custom-select';
 import { Loader2, Search } from 'lucide-react';
 import { trackEvent } from '@/lib/track';
 
@@ -153,22 +154,18 @@ export default function HistoryPanel() {
               className="field"
             />
           </div>
-          <select
+          <CustomSelect
             value={university}
-            onChange={(e) => {
-              setUniversity(e.target.value);
-              trackEvent('history_filter_changed', { university: e.target.value });
-            }}
-            aria-label="Filter by university"
-            className="field md:w-56"
-          >
-            <option value="all">All universities</option>
-            {universities.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
+            onChange={setUniversity}
+            options={
+              [
+                { value: 'all', label: 'All universities' },
+                ...universities.map((u) => ({ value: u, label: u })),
+              ] as Option[]
+            }
+            placeholder="Filter by university…"
+            listClassName="max-h-48"
+          />
         </div>
 
         <p className="mt-3 text-xs leading-5 text-muted">

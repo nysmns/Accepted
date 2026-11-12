@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { CustomSelect, type Option } from './custom-select';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
@@ -90,21 +91,15 @@ export default function Vault() {
             />
           </div>
           <div className="relative sm:w-56">
-            <label className="sr-only" htmlFor="vault-requirement">
-              Filter by requirement
-            </label>
-            <select
-              id="vault-requirement"
-              className="field"
+            <CustomSelect
               value={requirement}
-              onChange={(e) => setRequirement(e.target.value as Requirement)}
-            >
-              {REQUIREMENTS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setRequirement(v as Requirement)}
+              options={
+                REQUIREMENTS.map((r) => ({ value: r.value, label: r.label })) as Option[]
+              }
+              placeholder="Filter by requirement…"
+              listClassName="max-h-48"
+            />
           </div>
         </div>
 

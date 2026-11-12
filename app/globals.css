@@ -172,6 +172,30 @@ select.field optgroup,select.input optgroup{
   color:var(--color-muted);
 }
 select.field optgroup option{background:#fff;display:block}
+
+/* Custom-select dropdown list — consistent rounded corners + scrollbar. */
+.select-dropdown{
+  position:absolute;
+  z-index:50;
+  top:100%;
+  left:0;
+  right:0;
+  margin-top:6px;
+  border:1px solid var(--color-line);
+  border-radius:14px;
+  background:var(--color-paper);
+  box-shadow:0 8px 30px #243c321a;
+  overflow-y:auto;
+  max-height:360px;
+}
+.select-dropdown::-webkit-scrollbar{width:8px}
+.select-dropdown::-webkit-scrollbar-track{background:var(--color-canvas)}
+.select-dropdown::-webkit-scrollbar-thumb{background:var(--color-accent);border-radius:4px}
+.select-dropdown::-webkit-scrollbar-thumb:hover{background:var(--color-accent-strong)}
+.select-dropdown[aria-expanded=true]{
+  border-color:var(--color-accent);
+  box-shadow:0 8px 30px #2359471a;
+}
 textarea.field,textarea.input{resize:vertical;line-height:1.9}
 .field-label,.label{color:var(--color-secondary);margin-bottom:7px;font-size:12px;font-weight:550;display:block}
 .search-field{position:relative}

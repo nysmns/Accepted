@@ -21,7 +21,7 @@ export interface CustomSelectProps<T extends string = string> {
   disabled?: boolean;
   /** CSS class for the button base */
   buttonClassName?: string;
-  /** CSS class for the dropdown list */
+  /** Additional CSS class for the dropdown list (for height/overflow) */
   listClassName?: string;
   /** Icon to show on the right side of the button */
   icon?: React.ReactNode;
@@ -185,7 +185,7 @@ export function CustomSelect<T extends string = string>({
           ref={listRef}
           role="listbox"
           aria-label="Options"
-          className={`absolute z-50 top-full left-0 right-0 mt-2 rounded-10 border border-line bg-paper shadow-lg min-w-0 overflow-hidden ${listClassName}`}
+          className={`select-dropdown ${listClassName || ''}`}
         >
           {options.map((option, index) => (
             <li

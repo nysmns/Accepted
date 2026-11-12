@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback, type KeyboardEvent } from 'react';
+import { CustomSelect, type Option } from './custom-select';
 import { Check, CloudUpload, Loader2, MessageSquareWarning, Plus, Trash2 } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
 import { EC_KEY, type EcLevel } from '@/lib/position';
@@ -200,23 +201,20 @@ export default function EcRater() {
           <label htmlFor="ec-target" className="field-label">
             Target program (optional)
           </label>
-          <select
-            id="ec-target"
+          <CustomSelect
             value={target}
-            onChange={(e) => setTarget(e.target.value)}
-            className="field"
-          >
-            <option value="">No specific program</option>
-            {UNIVERSITIES.map((u) => (
-              <optgroup key={u.key} label={u.name}>
-                {u.programs.map((p) => (
-                  <option key={p.code} value={`${u.name}: ${p.name}`}>
-                    {p.name}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+            onChange={setTarget}
+            options={
+              [
+                { value: '', label: 'No specific program' },
+                ...UNIVERSITIES.flatMap((u) =>
+                  u.programs.map((p) => ({ value: `${u.name}: ${p.name}`, label: p.name }))
+                ),
+              ] as Option[]
+            }
+            placeholder="Select a program (optional)…"
+            listClassName="max-h-48"
+          />
         </div>
 
         {ecs.map((ec, i) => (

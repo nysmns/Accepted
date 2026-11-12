@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useAuth } from './auth-provider';
 import Link from 'next/link';
 import {
   SIMULATOR_PROGRAMS,
@@ -10,7 +11,7 @@ import {
 import { UNIVERSITIES } from '@/lib/data/programs';
 import { authFetch } from '@/lib/supabase/client';
 import { trackEvent } from '@/lib/track';
-import { useAuth } from './auth-provider';
+import { CustomSelect, type Option } from './custom-select';
 import ScoreRing from './score-ring';
 import {
   ArrowRight,
@@ -384,58 +385,51 @@ export default function Simulator() {
           <label htmlFor="sim-uni" className="label">
             Target university
           </label>
-          <select
-            id="sim-uni"
+          <CustomSelect
             value={uniKey}
-            onChange={(e) => setUniKey(e.target.value)}
-            className="input"
-          >
-            <option value="all">All universities</option>
-            {UNIVERSITIES.map((u) => (
-              <option key={u.key} value={u.key}>
-                {u.short}
-              </option>
-            ))}
-          </select>
+            onChange={setUniKey}
+            options={
+              [
+                { value: 'all', label: 'All universities' },
+                ...UNIVERSITIES.map((u) => ({ value: u.key, label: u.short })),
+              ] as Option[]
+            }
+            placeholder="Select a university…"
+          />
         </div>
         <div>
           <label htmlFor="sim-program" className="label">
             Target program
           </label>
-          <select
-            id="sim-program"
+          <CustomSelect
             value={programCode}
-            onChange={(e) => setProgramCode(e.target.value)}
-            className="input"
-            disabled={!getSimulatorProgram(programCode)}
-          >
-            {(uniKey === 'all'
-              ? UNIVERSITIES.flatMap((u) => u.programs)
-              : (UNIVERSITIES.find((u) => u.key === uniKey)?.programs ?? [])
-            ).map((p) => (
-              <option key={p.code} value={p.code}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+            onChange={setProgramCode}
+            options={
+              uniKey === 'all'
+                ? UNIVERSITIES.flatMap((u) =>
+                    u.programs.map((p) => ({ value: p.code, label: p.name }))
+                  )
+                : (UNIVERSITIES.find((u) => u.key === uniKey)?.programs ?? []).map((p) => ({
+                    value: p.code,
+                    label: p.name,
+                  }))
+            }
+            placeholder="Select a program…"
+            disabled={uniKey === 'all' ? UNIVERSITIES.flatMap((u) => u.programs).length === 0 : (UNIVERSITIES.find((u) => u.key === uniKey)?.programs ?? []).length === 0}
+          />
         </div>
-
         <div>
           <label htmlFor="sim-type" className="label">
             Question format
           </label>
-          <select
-            id="sim-type"
+          <CustomSelect
             value={format}
-            onChange={(e) => setFormat(e.target.value as Format)}
-            className="input"
-          >
-            {(Object.keys(FORMATS) as Format[]).map((f) => (
-              <option key={f} value={f}>
-                {FORMATS[f].label}
-              </option>
-            ))}
-          </select>
+            onChange={setFormat}
+            options={
+              (Object.keys(FORMATS) as Format[]).map((f) => ({ value: f, label: FORMATS[f].label }))
+            }
+            placeholder="Select a format…"
+          />
         </div>
 
         <button onClick={startSimulation} className="btn-primary w-full">
