@@ -233,7 +233,7 @@ export default function Scholarships() {
               className="field pl-9"
             />
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex-[1fr] min-w-0">
             <CustomSelect
             value={field}
             onChange={setField}
