@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { SCHOLARSHIPS } from '@/lib/data/scholarships';
+import type { Scholarship } from '@/lib/scholarships';
 import {
   activeScholarships,
   fieldsForGroups,
@@ -15,18 +15,9 @@ import { getSessionUser, getSupabaseAdmin } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const LAST_VERIFIED = SCHOLARSHIPS.reduce(
-  (latest, s) => (s.verified > latest ? s.verified : latest),
-  '2000-01-01'
-);
-
-/** Fresh, merged list (curated + remote supplement). */
-let cachedMerged: { all: typeof SCHOLARSHIPS; fetchedAt: string; remoteCount: number } | null =
-  null;
-
-function buildCacheKey() {
-  return `${LAST_VERIFIED}|${String(cachedMerged?.fetchedAt)}`;
-}
+/** Fresh, merged list (3 Canadian sources + locally curated entries).
+ *  Cached for 5 minutes on the server. */
+let cachedMerged: { all: Scholarship[]; fetchedAt: string; sourceCount: number } | null = null;
 
 /**
  * Active scholarships only. Signed-in students also get a profile-based
@@ -40,8 +31,8 @@ export async function GET(req: Request) {
 
   if (!cachedMerged || joined || now - new Date(cachedMerged?.fetchedAt ?? 0).getTime() > 300_000) {
     // Force refresh when the client asks for it, or every 5 minutes otherwise.
-    const { all, remote, remoteCount, fetchedAt, error } = await refreshScholarships();
-    cachedMerged = { all, fetchedAt, remoteCount };
+    const { all, fetchedAt, sourceCount } = await refreshScholarships();
+    cachedMerged = { all, fetchedAt, sourceCount };
   }
 
   const active = activeScholarships(cachedMerged!.all);
@@ -52,7 +43,7 @@ export async function GET(req: Request) {
       recommended: [],
       profile: null,
       basis: null,
-      lastVerified: LAST_VERIFIED,
+      lastVerified: cachedMerged?.fetchedAt ?? new Date().toISOString().slice(0, 10),
       count: active.length,
     });
   }
@@ -112,8 +103,8 @@ export async function GET(req: Request) {
     recommended: recs.map((s) => s.id),
     profile,
     basis,
-    lastVerified: LAST_VERIFIED,
-    remoteCount: cachedMerged!.remoteCount,
+    lastVerified: cachedMerged?.fetchedAt ?? new Date().toISOString().slice(0, 10),
+    sourceCount: cachedMerged!.sourceCount,
     fetchedAt: cachedMerged!.fetchedAt,
     count: active.length,
   });

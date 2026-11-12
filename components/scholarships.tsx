@@ -17,12 +17,12 @@ type Response = {
   profile: StudentProfile | null;
   basis: string | null;
   lastVerified: string;
-  remoteCount: number;
+  sourceCount: number;
   fetchedAt: string;
   count: number;
 };
 
-const FIELD_FILTERS = ['All fields', 'STEM', 'Business', 'Healthcare', 'Arts', 'Education', 'Media', 'Trades'];
+const FIELD_FILTERS = ['All fields', 'STEM', 'Business', 'Health', 'Arts', 'Education', 'Law', 'Social Sciences', 'Trades', 'Environment'];
 
 export default function Scholarships() {
   const { user, loading: authLoading } = useAuth();
@@ -32,7 +32,7 @@ export default function Scholarships() {
   const [field, setField] = useState('All fields');
   const [onlyRecommended, setOnlyRecommended] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [remoteUrls, setRemoteUrls] = useState<string[]>([]);
+  const [sourceCount, setSourceCount] = useState(0);
 
   useEffect(() => {
     if (authLoading) return;
@@ -56,9 +56,7 @@ export default function Scholarships() {
       if (!res.ok) throw new Error();
       const fresh = await res.json();
       setData(fresh);
-      if (fresh.remoteCount > 0) {
-        setRemoteUrls(fresh.scholarships.filter((s: any) => s.source === 'grudged-open-scholarships').map((s: any) => s.url));
-      }
+      setSourceCount(fresh.sourceCount);
     } catch {
       setError('Could not refresh. Try again in a moment.');
     } finally {
@@ -150,12 +148,11 @@ export default function Scholarships() {
           Showing <strong>{data?.count ?? 0} active awards</strong> only — anything past its deadline
           is hidden. Deadlines last checked{' '}
           <strong>{data ? new Date(`${data.lastVerified}T00:00:00Z`).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</strong>.
-          {data && data.remoteCount > 0 ? (
+          {data && data.sourceCount > 0 ? (
             <span>
               {' '}
-              Plus <strong>{data.remoteCount}</strong> live external listing (please note: the free
-              public scrape carries US/Nevada awards, so it supplements — never replaces — our
-              Canadian nationally matched list).
+              Synced from <strong>{data.sourceCount} sources</strong> (live). Always confirm the
+              deadline and eligibility on the provider's site before you apply.
             </span>
           ) : null}{' '}
           Always confirm the deadline and eligibility on the provider&apos;s site before you apply.
@@ -225,15 +222,15 @@ export default function Scholarships() {
 
       <div className="panel panel-pad space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row">
-          <div className="search-field flex-1">
-            <Search size={16} />
+          <div className="search-field flex-1 min-w-0">
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search scholarships"
               placeholder="Award, provider, field, or activity…"
-              className="field"
+              className="field pl-9"
             />
           </div>
           <CustomSelect
