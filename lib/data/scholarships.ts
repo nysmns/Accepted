@@ -42,7 +42,7 @@ export const SCHOLARSHIPS: Scholarship[] = [
     meritBased: true,
     description:
       'Canada’s largest undergraduate STEM scholarship. High schools nominate one student each; recipients receive up to $120,000 for engineering or $100,000 for science, math or computer science.',
-    url: 'https://schulichleaders.ca/',
+    url: 'https://schulichleaders.com/',
     source: 'schulichleaders.ca',
     verified: '2026-11-11',
   },
