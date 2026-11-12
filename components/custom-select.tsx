@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState, type KeyboardEvent, type SelectHTMLAttributes } from 'react';
+import { useCallback, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 
 export type Option<T extends string = string> = {
   value: T;
@@ -128,7 +128,6 @@ export function CustomSelect<T extends string = string>({
   );
 
   const handleBlur = useCallback(() => {
-    // Small delay so we don't close when clicking the dropdown list
     const timer = setTimeout(() => setOpen(false), 150);
     return () => clearTimeout(timer);
   }, []);
@@ -148,8 +147,6 @@ export function CustomSelect<T extends string = string>({
     document.addEventListener('mousedown', handleDocumentClick);
     return () => document.removeEventListener('mousedown', handleDocumentClick);
   }, [open]);
-
-  const listItems = options.filter((o) => !o.disabled || open);
 
   return (
     <div className="relative w-full">
@@ -185,22 +182,14 @@ export function CustomSelect<T extends string = string>({
           ref={listRef}
           role="listbox"
           aria-label="Options"
-          className={`select-dropdown ${listClassName || ''}`}
+          className={'select-dropdown p-1 ' + (listClassName || '')}
         >
           {options.map((option, index) => (
             <li
               key={option.value}
               role="option"
               aria-selected={option.value === value}
-              className={`flex items-center justify-between gap-3 px-4 py-3.5 text-left cursor-pointer transition-colors ${
-                option.disabled
-                  ? 'opacity-45 cursor-not-allowed'
-                  : hoverIndex === index
-                    ? 'bg-accent-tint'
-                    : index === 0
-                      ? 'bg-paper'
-                      : 'hover:bg-accent-tint'
-              }`}
+              className={`flex items-center justify-between gap-3 px-4 py-3.5 text-left cursor-pointer transition-colors ${option.disabled ? 'opacity-45 cursor-not-allowed' : option.value === value ? 'bg-accent-tint' : hoverIndex === index ? 'bg-accent-tint' : index === 0 ? 'bg-paper' : 'hover:bg-accent-tint'}`}
               onClick={() => {
                 if (!option.disabled) handleOptionClick(option.value);
               }}
@@ -210,22 +199,6 @@ export function CustomSelect<T extends string = string>({
               <span className="min-w-0 flex-1 text-sm text-foreground">
                 {option.label}
               </span>
-              {option.value === value && (
-                <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-accent text-on-accent">
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fill="#fffaf1"
-                      d="M1 9L4.5 5.5L9 9"
-                    />
-                  </svg>
-                </span>
-              )}
             </li>
           ))}
         </ul>
