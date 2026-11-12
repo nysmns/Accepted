@@ -131,7 +131,7 @@ export default function Home() {
                 <Icon size={21} strokeWidth={1.6} />
               </span>
               <div>
-                <p className="eyebrow text-muted!">{step}</p>
+                <p className="eyebrow">{step}</p>
                 <h3 className="mt-1">{title}</h3>
               </div>
               <p>{body}</p>

@@ -121,7 +121,10 @@ input[type=range]{min-height:44px}
 .field::placeholder,.input::placeholder{color:var(--color-muted)}
 .field:focus,.input:focus{border-color:var(--color-accent);outline:none;box-shadow:0 0 0 3px #23594712}
 .field:disabled{opacity:.65}
-select.field,select.input{text-overflow:ellipsis;padding-right:32px}
+select.field,select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2362675a' d='M6 8.5L2.5 4.5h7z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:40px;print-color-adjust:exact}
+select.field:hover,select.input:hover{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23243c32' d='M6 8.5L2.5 4.5h7z'/%3E%3C/svg%3E")}
+select.field:focus,select.input:focus{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23235947' d='M6 8.5L2.5 4.5h7z'/%3E%3C/svg%3E")}
+select:disabled.field,select:disabled.input{background-image:none;opacity:.6}
 textarea.field,textarea.input{resize:vertical;line-height:1.9}
 .field-label,.label{color:var(--color-secondary);margin-bottom:7px;font-size:12px;font-weight:550;display:block}
 .search-field{position:relative}

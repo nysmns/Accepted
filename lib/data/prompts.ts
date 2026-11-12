@@ -265,6 +265,36 @@ export const SIMULATOR_PROGRAMS: SimulatorProgram[] = [
       'What does responsible management mean to you, and how have you practiced it?',
     ],
   },
+  {
+    code: 'trent_sw',
+    label: 'Trent–Swansea Law Dual Degree',
+    group: 'Business & Commerce',
+    university: 'Trent University',
+    prompts: [
+      'Why do you want to pursue a joint law and arts/business degree, and what makes you a strong fit?',
+      'Describe a time your perspective on law, justice, or leadership changed. What caused it?',
+    ],
+  },
+  {
+    code: 'laurentian_arch',
+    label: 'Laurentian Architectural Studies',
+    group: 'Arts, Design & Architecture',
+    university: 'Laurentian University',
+    prompts: [
+      'Describe a built environment you find interesting and propose one change to improve it.',
+      'What draws you to architecture, and how have you explored design?',
+    ],
+  },
+  {
+    code: 'laurentian_sw',
+    label: 'Laurentian Indigenous Social Work',
+    group: 'Health Sciences & Nursing',
+    university: 'Laurentian University',
+    prompts: [
+      'Why do you want to study Indigenous Social Work, and what experience have you had in Indigenous communities?',
+      'Describe a time you worked with Indigenous peoples or communities. What did you learn?',
+    ],
+  },
 ];
 
 export const PROGRAM_GROUPS = [

@@ -34,6 +34,14 @@ const CHECKLIST = [
   'Check portals regularly for updates or new tasks',
 ];
 
+/** Programs available for the current university filter. */
+function programsFor(university: string) {
+  if (university === 'all') {
+    return UNIVERSITIES.flatMap((u) => u.programs);
+  }
+  return UNIVERSITIES.find((u) => u.key === university)?.programs ?? [];
+}
+
 const PROGRAM_OPTIONS = UNIVERSITIES.flatMap((university) =>
   university.programs.map((program, index) => ({
     id: `${university.key}-${index}-${program.name}`,
@@ -64,6 +72,7 @@ export default function Planner() {
   const [selected, setSelected] = useState<PlannedProgram[]>([]);
   const [completed, setCompleted] = useState<string[]>([]);
   const [choice, setChoice] = useState('');
+  const [uniKey, setUniKey] = useState<string>('all');
   const [saved, setSaved] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [ecLevel, setEcLevel] = useState<EcLevel | null>(null);
@@ -189,34 +198,49 @@ export default function Planner() {
             </div>
 
             <div className="mt-6 flex max-w-2xl items-stretch gap-3">
-              <label className="sr-only" htmlFor="planner-program">
-                Choose a university program
-              </label>
-              <select
-                id="planner-program"
-                value={choice}
-                onChange={(event) => setChoice(event.target.value)}
-                className="field min-w-0 flex-1"
-              >
-                <option value="">Choose a program to add…</option>
-                {UNIVERSITIES.map((university) => (
-                  <optgroup key={university.key} label={university.name}>
-                    {PROGRAM_OPTIONS.filter((program) => program.university === university.name).map(
-                      (program) => (
-                        <option key={program.id} value={program.id}>
-                          {program.name}
-                        </option>
-                      )
-                    )}
-                  </optgroup>
-                ))}
-              </select>
+              <div className="flex min-w-0 flex-1">
+                <label className="sr-only" htmlFor="planner-uni">
+                  Choose a university
+                </label>
+                <select
+                  id="planner-uni"
+                  value={uniKey}
+                  onChange={(event) => setUniKey(event.target.value)}
+                  className="field w-full"
+                >
+                  <option value="all">All universities</option>
+                  {UNIVERSITIES.map((u) => (
+                    <option key={u.key} value={u.key}>
+                      {u.short}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex min-w-0 flex-1">
+                <label className="sr-only" htmlFor="planner-program">
+                  Choose a program
+                </label>
+                <select
+                  id="planner-program"
+                  value={choice}
+                  onChange={(event) => setChoice(event.target.value)}
+                  className="field w-full"
+                  disabled={programsFor(uniKey).length === 0}
+                >
+                  <option value="">Choose a program…</option>
+                  {programsFor(uniKey).map((p) => (
+                    <option key={p.code} value={p.code}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <button
                 onClick={addProgram}
-                disabled={!choice || selected.some((program) => program.id === choice)}
+                disabled={!choice || selected.some((program) => program.code === choice)}
                 className="btn-primary shrink-0"
               >
-                <Plus className="h-4 w-4" /> Add program
+                <Plus className="h-4 w-4" /> Add
               </button>
             </div>
 
@@ -230,6 +254,20 @@ export default function Planner() {
                 </div>
               ) : (
                 <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-foreground">Your current shortlist</p>
+                    <button
+                      onClick={() => {
+                        setSelected([]);
+                        setChoice('');
+                        setSaved(true);
+                        trackEvent('shortlist_cleared');
+                      }}
+                      className="inline-flex items-center gap-1.5 text-sm text-muted underline underline-offset-4 hover:text-foreground"
+                    >
+                      <Trash2 size={14} /> Clear all
+                    </button>
+                  </div>
                   {selected.map((program) => {
                     const position = academicPosition(average, program.avg);
                     return (

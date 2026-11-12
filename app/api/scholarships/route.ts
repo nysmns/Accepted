@@ -9,6 +9,7 @@ import {
 } from '@/lib/scholarships';
 import { categoriesForEcs } from '@/lib/ec-tags';
 import { getSimulatorProgram } from '@/lib/data/prompts';
+import { refreshScholarships } from '@/lib/scholarships/repository';
 import { getSessionUser, getSupabaseAdmin } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -19,6 +20,14 @@ const LAST_VERIFIED = SCHOLARSHIPS.reduce(
   '2000-01-01'
 );
 
+/** Fresh, merged list (curated + remote supplement). */
+let cachedMerged: { all: typeof SCHOLARSHIPS; fetchedAt: string; remoteCount: number } | null =
+  null;
+
+function buildCacheKey() {
+  return `${LAST_VERIFIED}|${String(cachedMerged?.fetchedAt)}`;
+}
+
 /**
  * Active scholarships only. Signed-in students also get a profile-based
  * ranking built from their saved extracurriculars and their supplemental
@@ -26,7 +35,16 @@ const LAST_VERIFIED = SCHOLARSHIPS.reduce(
  */
 export async function GET(req: Request) {
   const user = await getSessionUser(req.headers.get('authorization'));
-  const active = activeScholarships(SCHOLARSHIPS);
+  const joined = new URL(req.url).searchParams.get('refresh') === '1';
+  const now = Date.now();
+
+  if (!cachedMerged || joined || now - new Date(cachedMerged?.fetchedAt ?? 0).getTime() > 300_000) {
+    // Force refresh when the client asks for it, or every 5 minutes otherwise.
+    const { all, remote, remoteCount, fetchedAt, error } = await refreshScholarships();
+    cachedMerged = { all, fetchedAt, remoteCount };
+  }
+
+  const active = activeScholarships(cachedMerged!.all);
 
   if (!user) {
     return NextResponse.json({
@@ -95,6 +113,8 @@ export async function GET(req: Request) {
     profile,
     basis,
     lastVerified: LAST_VERIFIED,
+    remoteCount: cachedMerged!.remoteCount,
+    fetchedAt: cachedMerged!.fetchedAt,
     count: active.length,
   });
 }

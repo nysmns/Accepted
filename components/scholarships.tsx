@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Check, Loader2, Search, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Check, Loader2, RefreshCw, Search, Sparkles } from 'lucide-react';
 import type { ScoredScholarship, StudentProfile } from '@/lib/scholarships';
 import { readPlannerAverage } from '@/lib/position';
 import { authFetch } from '@/lib/supabase/client';
@@ -16,6 +16,8 @@ type Response = {
   profile: StudentProfile | null;
   basis: string | null;
   lastVerified: string;
+  remoteCount: number;
+  fetchedAt: string;
   count: number;
 };
 
@@ -28,6 +30,8 @@ export default function Scholarships() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState('All fields');
   const [onlyRecommended, setOnlyRecommended] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [remoteUrls, setRemoteUrls] = useState<string[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -40,6 +44,26 @@ export default function Scholarships() {
       })
       .catch(() => setError('Could not load current scholarships. Try again in a moment.'));
   }, [authLoading, user]);
+
+  /** Manual refresh: re-fetch live remote supplement and merge with the curated list. */
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      const average = readPlannerAverage();
+      const url = `/api/scholarships?refresh=1${average != null ? `&average=${average}` : ''}`;
+      const res = await authFetch(url);
+      if (!res.ok) throw new Error();
+      const fresh = await res.json();
+      setData(fresh);
+      if (fresh.remoteCount > 0) {
+        setRemoteUrls(fresh.scholarships.filter((s: any) => s.source === 'grudged-open-scholarships').map((s: any) => s.url));
+      }
+    } catch {
+      setError('Could not refresh. Try again in a moment.');
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   const recommendedIds = useMemo(
     () => new Set(data?.recommended ?? []),
@@ -125,7 +149,27 @@ export default function Scholarships() {
           Showing <strong>{data?.count ?? 0} active awards</strong> only — anything past its deadline
           is hidden. Deadlines last checked{' '}
           <strong>{data ? new Date(`${data.lastVerified}T00:00:00Z`).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</strong>.
+          {data && data.remoteCount > 0 ? (
+            <span>
+              {' '}
+              Plus <strong>{data.remoteCount}</strong> live external listing (please note: the free
+              public scrape carries US/Nevada awards, so it supplements — never replaces — our
+              Canadian nationally matched list).
+            </span>
+          ) : null}{' '}
           Always confirm the deadline and eligibility on the provider&apos;s site before you apply.
+          <div className="mt-2 flex items-center gap-2 text-xs text-muted">
+            <span className="inline-flex items-center gap-1">
+              <RefreshCw
+                className={`size-3 ${refreshing ? 'animate-spin' : ''}`}
+                aria-hidden="true"
+              />
+              {refreshing ? 'Refreshing…' : `Last synced ${new Date(data?.fetchedAt ?? 0).toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}`}
+            </span>
+            <button onClick={handleRefresh} className="btn-ghost btn-sm shrink-0" disabled={refreshing}>
+              Refresh
+            </button>
+          </div>
         </p>
       </div>
 

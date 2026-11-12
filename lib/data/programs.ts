@@ -282,6 +282,41 @@ export const UNIVERSITIES: University[] = [
     ],
   },
   {
+    key: 'laurentian',
+    name: 'Laurentian University',
+    short: 'Laurentian',
+    programs: [
+      {
+        name: 'Architectural Studies',
+        avg: '85%+',
+        req: 'Portfolio submission and statement of interest.',
+        deadline: 'Feb 1',
+        code: 'laurentian_arch',
+      },
+      {
+        name: 'Indigenous Social Work',
+        avg: '80%+',
+        req: 'Supplemental application package (experience & teaching focus).',
+        deadline: 'Feb 1',
+        code: 'laurentian_sw',
+      },
+    ],
+  },
+  {
+    key: 'trent',
+    name: 'Trent University',
+    short: 'Trent',
+    programs: [
+      {
+        name: 'Law & Arts / Law & Business (Trent–Swansea Dual Degree)',
+        avg: '82%+',
+        req: 'Internal application indicating intent to continue onto the dual degree.',
+        deadline: 'Feb 1',
+        code: 'trent_sw',
+      },
+    ],
+  },
+  {
     key: 'carleton',
     name: 'Carleton University',
     short: 'Carleton',
