@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, Circle, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import { UNIVERSITIES } from '@/lib/data/programs';
@@ -8,6 +8,7 @@ import { PLANNER_KEY, academicPosition, readEcLevel, type EcLevel } from '@/lib/
 import { EcFit, ProgramTags, RangeBar } from './program-signals';
 import HistoryPanel from './history-panel';
 import { trackEvent } from '@/lib/track';
+import { CustomSelect, type Option } from './custom-select';
 
 type PlannedProgram = {
   id: string;
@@ -199,41 +200,36 @@ export default function Planner() {
 
             <div className="mt-6 flex max-w-2xl items-stretch gap-3">
               <div className="flex min-w-0 flex-1">
-                <label className="sr-only" htmlFor="planner-uni">
-                  Choose a university
-                </label>
-                <select
-                  id="planner-uni"
+                <CustomSelect
                   value={uniKey}
-                  onChange={(event) => setUniKey(event.target.value)}
-                  className="field w-full"
-                >
-                  <option value="all">All universities</option>
-                  {UNIVERSITIES.map((u) => (
-                    <option key={u.key} value={u.key}>
-                      {u.short}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setUniKey}
+                  options={
+                    [
+                      { value: 'all', label: 'All universities' },
+                      ...UNIVERSITIES.map((u) => ({ value: u.key, label: u.short })),
+                    ] as Option[]
+                  }
+                  placeholder="Select a university…"
+                  disabled={false}
+                  listClassName="max-h-60 overflow-auto p-2"
+                  buttonClassName="w-full"
+                />
               </div>
               <div className="flex min-w-0 flex-1">
-                <label className="sr-only" htmlFor="planner-program">
-                  Choose a program
-                </label>
-                <select
-                  id="planner-program"
+                <CustomSelect
                   value={choice}
-                  onChange={(event) => setChoice(event.target.value)}
-                  className="field w-full"
+                  onChange={setChoice}
+                  options={
+                    PROGRAM_OPTIONS.filter((p) => uniKey === 'all' || p.id.startsWith(uniKey + '-')).map((p) => ({
+                      value: p.id,
+                      label: p.name,
+                    })) as Option[]
+                  }
+                  placeholder="Select a program…"
                   disabled={programsFor(uniKey).length === 0}
-                >
-                  <option value="">Choose a program…</option>
-                  {PROGRAM_OPTIONS.filter((p) => uniKey === 'all' || p.id.startsWith(uniKey + '-')).map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                  listClassName="max-h-60 overflow-auto p-2"
+                  buttonClassName="w-full"
+                />
               </div>
               <button
                 onClick={addProgram}
