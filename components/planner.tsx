@@ -228,8 +228,8 @@ export default function Planner() {
                   disabled={programsFor(uniKey).length === 0}
                 >
                   <option value="">Choose a program…</option>
-                  {programsFor(uniKey).map((p) => (
-                    <option key={p.code} value={p.code}>
+                  {PROGRAM_OPTIONS.filter((p) => uniKey === 'all' || p.id.startsWith(uniKey + '-')).map((p) => (
+                    <option key={p.id} value={p.id}>
                       {p.name}
                     </option>
                   ))}
@@ -237,7 +237,7 @@ export default function Planner() {
               </div>
               <button
                 onClick={addProgram}
-                disabled={!choice || selected.some((program) => program.code === choice)}
+                disabled={!choice || selected.some((program) => program.id === choice)}
                 className="btn-primary shrink-0"
               >
                 <Plus className="h-4 w-4" /> Add
