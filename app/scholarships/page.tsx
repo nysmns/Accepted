@@ -1,3 +1,4 @@
+import RequireAuth from '@/components/require-auth';
 import Scholarships from '@/components/scholarships';
 
 export const metadata = {
@@ -20,7 +21,9 @@ export default function ScholarshipsPage() {
         </div>
       </header>
 
-      <Scholarships />
+      <RequireAuth what="scholarship finder" eyebrow="Your practice, kept personal">
+        <Scholarships />
+      </RequireAuth>
     </div>
   );
 }
